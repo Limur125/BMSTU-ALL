@@ -4,7 +4,7 @@ import tkinter.messagebox as mb
 circles_list = []
 points_list = []
 circle_drawing = []
-act_log = []
+last_act = []
 res_line = [] 
 #==========================================================================================
 def str_to_float(str):
@@ -18,11 +18,17 @@ def create_circle(xc, yc, r):
     circle_id = canv.create_oval(xc - r, yc - r, xc + r, yc + r, width=3, outline='dark red', activeoutline='red3')
     circle_drawing.append(r)
     circle_drawing.append(circle_id)
-    act_log.append(circle_id)
+    last_act.clear()
+    last_act.append('del')
+    last_act.append('cir')
+    last_act.append(circle_id)
 
 def create_point(x, y):
     point_id = canv.create_oval(x - 0.1, y - 0.1, x + 0.1, y + 0.1, width=3, outline='black', fill='black', activeoutline='gray34', activefill='gray34')
-    act_log.append(point_id)
+    last_act.clear()
+    last_act.append('del')
+    last_act.append('poi')
+    last_act.append(point_id)
     points_list.append([x, y, point_id])
 
 def xc_yc_coords(event):
@@ -83,27 +89,32 @@ def circle_text():
     if type(circlex) != float or type(circley) != float or  type(circler) != float:
         lblcircleerr.grid(row=7, column=1)
         return
+    circle_drawing.append(circlex)
+    circle_drawing.append(circley)
     create_circle(circlex, circley, circler)
+    circles_list.append(circle_drawing.copy())
     entcirclex.delete(0, END)
     entcircley.delete(0, END)
     entcircler.delete(0, END)
 
 def undo_last_act():
-    if len(act_log) != 0:
-        try:
-            canv.delete(res_line[0])
-        except:
-            None
-        res_line.clear()
-        canv.delete(act_log[-1])
-        if len(circles_list) != 0:
-            if circles_list[-1][3] == act_log[-1]:
+    print(last_act)
+    if len(last_act) != 0:
+        if last_act[0] == 'del':
+            if last_act[1] == 'cir':
                 circles_list.pop()
-        elif len(points_list) != 0:
-            if points_list[-1][2] == act_log[-1]:
+            elif last_act[1] == 'poi':
                 points_list.pop()
-        act_log.pop()
-
+            canv.delete(last_act[2])
+        elif last_act[0] == 'cre':
+            if last_act[1] == 'cir':
+                circle_drawing.append(last_act[2][0])
+                circle_drawing.append(last_act[2][1])
+                create_circle(last_act[2][0], last_act[2][1], last_act[2][2])
+                circles_list.append(circle_drawing.copy())
+            elif last_act[1] == 'poi':
+                create_point(last_act[2][0], last_act[2][1])
+            last_act.clear()
 def zoom(event):
     if (event.delta > 0):
         canv.scale("all", event.x, event.y, 1.1, 1.1)
@@ -116,11 +127,19 @@ def deleteitem(event):
         return
     for i in range(len(circles_list)):
         if circles_list[i][3] == item[0]:
-            circles_list.pop()
+            last_act.clear()
+            last_act.append('cre')
+            last_act.append('cir')
+            last_act.append(circles_list[i])
+            circles_list.pop(i)
             break
     for i in range(len(points_list)):
         if points_list[i][2] == item[0]:
-            points_list.pop()
+            last_act.clear()
+            last_act.append('cre')
+            last_act.append('poi')
+            last_act.append(points_list[i])
+            points_list.pop(i)
             break
     canv.delete(item[0])
 
