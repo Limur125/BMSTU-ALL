@@ -6,6 +6,13 @@ points_list = []
 circle_drawing = []
 last_act = []
 res_line = [] 
+
+win = Tk()
+
+canv = Canvas(win, width=1000, height=1000, bg='white')
+canv.grid(row=0, column=0)
+
+zero = canv.create_oval(0, 0, 0, 0, state=HIDDEN)
 #==========================================================================================
 def str_to_float(str):
     try:
@@ -23,12 +30,15 @@ def create_circle(xc, yc, r):
     last_act.append('cir')
     last_act.append(circle_id)
 
-def create_point(x, y):
+def create_point(x, y, text=0):
     point_id = canv.create_oval(x - 0.1, y - 0.1, x + 0.1, y + 0.1, width=3, outline='black', fill='black', activeoutline='gray34', activefill='gray34')
     last_act.clear()
     last_act.append('del')
     last_act.append('poi')
     last_act.append(point_id)
+    if text == 1:
+        x -= canv.coords(zero)[0]
+        y -= canv.coords(zero)[1]
     points_list.append([x, y, point_id])
 
 def xc_yc_coords(event):
@@ -77,7 +87,9 @@ def point_text():
     if type(pointx) != float or type(pointy) != float:
         lblpointerr.grid(row=5, column=0)
         return
-    create_point(pointx, pointy)
+    pointx += canv.coords(zero)[0]
+    pointy += canv.coords(zero)[1]
+    create_point(pointx, pointy, text=1)
     entpointx.delete(0, END)
     entpointy.delete(0, END)
 
@@ -91,6 +103,8 @@ def circle_text():
         return
     circle_drawing.append(circlex)
     circle_drawing.append(circley)
+    circlex += canv.coords(zero)[0]
+    circley += canv.coords(zero)[1]
     create_circle(circlex, circley, circler)
     circles_list.append(circle_drawing.copy())
     entcirclex.delete(0, END)
@@ -105,21 +119,21 @@ def undo_last_act():
                 circles_list.pop()
             elif last_act[1] == 'poi':
                 points_list.pop()
-            canv.delete(last_act[2])
+            canv.itemconfigure(last_act[2], state=HIDDEN)
         elif last_act[0] == 'cre':
             if last_act[1] == 'cir':
-                circle_drawing.append(last_act[2][0])
-                circle_drawing.append(last_act[2][1])
-                create_circle(last_act[2][0], last_act[2][1], last_act[2][2])
-                circles_list.append(circle_drawing.copy())
+                canv.itemconfigure(last_act[2][3], state=NORMAL)
+                circles_list.append(last_act[2])
             elif last_act[1] == 'poi':
-                create_point(last_act[2][0], last_act[2][1])
+                canv.itemconfigure(last_act[2][2], state=NORMAL)
+                points_list.append(last_act[2])
             last_act.clear()
 def zoom(event):
     if (event.delta > 0):
-        canv.scale("all", event.x, event.y, 1.1, 1.1)
+        canv.scale("all", canv.canvasx(event.x), canv.canvasy(event.y), 1.1, 1.1)
     elif (event.delta < 0):
-        canv.scale("all", event.x, event.y, 0.9, 0.9)
+        canv.scale("all", canv.canvasx(event.x), canv.canvasy(event.y), 0.9, 0.9)
+    canv.configure(scrollregion=canv.bbox(ALL))
 
 def deleteitem(event):
     item = canv.find_withtag(CURRENT)
@@ -141,7 +155,7 @@ def deleteitem(event):
             last_act.append(points_list[i])
             points_list.pop(i)
             break
-    canv.delete(item[0])
+    canv.itemconfigure(item[0], state=HIDDEN)
 
 def finish_deleteitem(event):
     canv.unbind('<Button-1>')
@@ -159,13 +173,13 @@ def start_edit_circle(circle_ind):
     entcirclex.insert(0, str(circles_list[circle_ind][0]))
     entcircley.insert(0, str(circles_list[circle_ind][1]))
     entcircler.insert(0, str(circles_list[circle_ind][2]))
-    canv.delete(circles_list[circle_ind][3])
+    canv.itemconfigure(circles_list[circle_ind][3], state=HIDDEN)
     circles_list.pop(circle_ind)
 
 def start_edit_point(point_ind):
     entpointx.insert(0, str(points_list[point_ind][0]))
     entpointy.insert(0, str(points_list[point_ind][1]))
-    canv.delete(points_list[point_ind][2])
+    canv.itemconfigure(points_list[point_ind][2], state=HIDDEN)
     points_list.pop(point_ind)
 
 def edit_item(event):
@@ -232,15 +246,20 @@ def calculate():
             max_line = line
     coords1 = canv.coords(max_line[0][2])
     coords2 = canv.coords(max_line[1][2])
-    res_line_id = canv.create_line(coords1[0], coords1[1], coords2[0], coords2[1], fill='blue', width=2)
+    a = coords1[1] - coords2[1]
+    b = coords2[0] - coords1[0]
+    c = coords1[0] * coords2[1] - coords2[0] * coords1[1]
+    if b != 0:
+        y_600 = (-c - a * (min(coords1[0], coords2[0]) - 1000)) / b 
+        y600 = (-c - a * (max(coords1[0], coords2[0]) + 1000)) / b
+        res_line_id = canv.create_line(min(coords1[0], coords2[0]) - 1000, y_600, max(coords1[0], coords2[0]) + 1000, y600, fill='blue', width=2)
+    elif b == 0:
+        x_600 = -c / a 
+        res_line_id = canv.create_line(x_600, min(coords1[1], coords2[1]) - 1000, x_600, max(coords1[1], coords2[1]) + 1000, fill='blue', width=2)
     res_line.append(res_line_id)
     reslbl.configure(text=f'Прямая проходит через точки \nx1 = {max_line[0][0]} y1 = {max_line[0][1]} \nx2 = {max_line[1][0]} y2 = {max_line[1][1]}')
     reslbl.grid(row=3, column=0, columnspan=3)
 #==========================================================================================
-win = Tk()
-
-canv = Canvas(win, width=1000, height=1000, bg='white')
-canv.grid(row=0, column=0)
 
 frmpaint = Frame(win)
 frmtext = Frame(win)
