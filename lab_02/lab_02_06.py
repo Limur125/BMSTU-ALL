@@ -1,8 +1,5 @@
-from functools import total_ordering
 from tkinter import *
-from math import atan, degrees, radians, sqrt, pi, cos, sin
-from xml.etree.ElementTree import PI
-import numpy
+from math import atan, radians, pi, cos, sin
 import tkinter.messagebox as mb
 from numpy import linspace
 
