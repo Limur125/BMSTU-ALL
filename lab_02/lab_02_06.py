@@ -1,6 +1,7 @@
 from functools import total_ordering
 from tkinter import *
 from math import atan, degrees, radians, sqrt, pi, cos, sin
+from xml.etree.ElementTree import PI
 import numpy
 import tkinter.messagebox as mb
 from numpy import linspace
@@ -12,6 +13,8 @@ Total_kx = 1.0
 Total_ky = 1.0
 
 PICTURE = []
+PICTURE_LOG = []
+PICTURE_LOG_MAX_LEN = 50
 WIN_WIDTH = 1400
 WIN_HEIGHT = 900
 WIN_COLOR = "#66b3ff"
@@ -22,9 +25,6 @@ CV_HEIGHT = 800
 
 
 TEXT_COLOR = "lightblue"
-
-
-EPS = 0.14#0.1973
 
 X_CENTER = 0
 Y_CENTER = 0
@@ -72,25 +72,23 @@ def init_picture():
     PICTURE.append(canv.create_line(tuple(ellips)))
 
 
-def move_vert(dy, axes_move=False):
-    global Total_ky
-    pic_copy = PICTURE.copy()
+def move(dx, dy, axes_move=False, text_move=False):
+    global Total_ky, Total_kx, PICTURE_LOG
+    picture_record = [canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
+    if (not text_move and win.focus_get() != canv):
+        return
+    pic_copy = []
     if axes_move == True:
         pic_copy.append(ZERO)
         pic_copy.append(OX_LINE)
         pic_copy.append(OY_LINE)
+    pic_copy += PICTURE.copy()
     for obj in pic_copy:
-        canv.move(obj, 0, dy * Total_ky)
-
-def move_horiz(dx, axes_move=False):
-    global Total_kx
-    pic_copy = PICTURE.copy()
-    if axes_move == True:
-        pic_copy.append(ZERO)
-        pic_copy.append(OX_LINE)
-        pic_copy.append(OY_LINE)
-    for obj in pic_copy:
-        canv.move(obj, dx * Total_kx, 0)
+        picture_record.append(canv.coords(obj))
+        canv.move(obj, dx * Total_kx, dy * Total_ky)
+    if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
+        PICTURE_LOG = PICTURE_LOG[1:]
+    PICTURE_LOG.append(picture_record)
 
 def _rot(xc, yc, x, y, angle):
     x -= xc
@@ -99,19 +97,27 @@ def _rot(xc, yc, x, y, angle):
     _y = -x * sin(angle) + y * cos(angle)
     return _x + xc, _y + yc
 
-def rotate(angle, xc=None, yc=None):
+def rotate(angle, xc=None, yc=None, text_rot=False):
+    global PICTURE_LOG
+    if (not text_rot and win.focus_get() != canv):
+        return
     if xc == None or yc == None:
         center_coords = canv.coords(PICTURE[0])
         xc = center_coords[0]
         yc = center_coords[1]
+    picture_record = [canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
     for obj in PICTURE:
         obj_coords = canv.coords(obj)
+        picture_record.append(obj_coords)
         _obj_coords = []
         for i in range(len(obj_coords) // 2):
             _x, _y = _rot(xc, yc, obj_coords[i * 2], obj_coords[i * 2 + 1], angle)
             _obj_coords.append(_x)
             _obj_coords.append(_y)
         canv.coords(obj, tuple(_obj_coords))
+    if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
+        PICTURE_LOG = PICTURE_LOG[1:]
+    PICTURE_LOG.append(picture_record)
 
 def zoom_event(event):
     global Total_ky, Total_kx
@@ -125,18 +131,22 @@ def zoom_event(event):
         Total_ky *= 0.9
 
 def zoom(kx, ky, xc, yc):
-    pic_copy = PICTURE.copy()
-    pic_copy.append(ZERO)
-    pic_copy.append(OX_LINE)
-    pic_copy.append(OY_LINE)
+    global PICTURE_LOG
+    pic_copy = [ZERO, OX_LINE, OY_LINE]
+    pic_copy += PICTURE.copy()
+    picture_record = []
     for obj in pic_copy:
         obj_coords = canv.coords(obj)
+        picture_record.append(obj_coords)
         _obj_coords = []
         for i in range(len(obj_coords) // 2):
             _x, _y = _zoom(xc, yc, obj_coords[i * 2], obj_coords[i * 2 + 1], kx, ky)
             _obj_coords.append(_x)
             _obj_coords.append(_y)
         canv.coords(obj, tuple(_obj_coords))
+    if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
+         PICTURE_LOG = PICTURE_LOG[1:]
+    PICTURE_LOG.append(picture_record)
 
 def _zoom(xc, yc, x, y, kx, ky):
     x -= xc
@@ -163,7 +173,7 @@ def rotate_io():
         spin_angle.delete(0, END)
         return
 
-    rotate(angle, canv.coords(ZERO)[0] + x_c, canv.coords(ZERO)[1] + y_c)
+    rotate(angle, canv.coords(ZERO)[0] + x_c, canv.coords(ZERO)[1] + y_c, True)
 
 def zoom_io():
     try:
@@ -193,21 +203,25 @@ def move_io():
     except:
         mb.showerror("Ошибка", "Неверно введена величина смещения")
         return
-    move_vert(dy)
-    move_horiz(dx)
+    move(dx, dy, text_move=True)
 
 def focus(event):
-    win.focus_set()
+    canv.focus_set()
+
+def step_backing():
+    if not len(PICTURE_LOG):
+        return
+    pic_copy = [ZERO, OX_LINE, OY_LINE] + PICTURE.copy()
+    for i in range(len(pic_copy)):
+        canv.coords(pic_copy[i], tuple(PICTURE_LOG[-1][i]))
+    PICTURE_LOG.pop()
 
 init_picture()
+focus(None)
 
 win['bg'] = WIN_COLOR
 win.geometry("%dx%d" %(WIN_WIDTH, WIN_HEIGHT))
 win.attributes("-fullscreen", True)
-
-
-x_history = []
-y_history = []
 
 # Center
 center_label = Label(win, text = "Центр(для масштабирования и поворота)", font="-family {Consolas} -size 16", bg = WIN_COLOR)
@@ -287,16 +301,17 @@ clear = Button(win, text = "Сбросить", font="-family {Consolas} -size 14
 clear.place(x = CV_WIDE + 300, y = 760)
 
 
-win.bind('<Up>', lambda event: move_vert(-10))
-win.bind('<Right>', lambda event: move_horiz(10))
-win.bind('<Left>', lambda event: move_horiz(-10))
-win.bind('<Down>', lambda event: move_vert(10))
-win.bind('<w>', lambda event: move_vert(-10, True))
-win.bind('<d>', lambda event: move_horiz(10, True))
-win.bind('<a>', lambda event: move_horiz(-10, True))
-win.bind('<s>', lambda event: move_vert(10, True))
+win.bind('<Up>', lambda event: move(0, -10))
+win.bind('<Right>', lambda event: move(10, 0))
+win.bind('<Left>', lambda event: move(-10, 0))
+win.bind('<Down>', lambda event: move(0, 10))
+win.bind('<w>', lambda event: move(0, -10, True))
+win.bind('<d>', lambda event: move(10, 0, True))
+win.bind('<a>', lambda event: move(-10, 0, True))
+win.bind('<s>', lambda event: move(0, 10, True))
 win.bind('<q>', lambda event: rotate(0.1))
 win.bind('<e>', lambda event: rotate(-0.1))
+win.bind('<BackSpace>', lambda event: step_backing())
 canv.bind('<Button-1>', focus)
 canv.bind('<MouseWheel>', zoom_event)
 
