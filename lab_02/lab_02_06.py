@@ -19,7 +19,7 @@ PICTURE = []
 PICTURE_LOG = []
 PICTURE_LOG_MAX_LEN = 50
 
-LABEL_COLOR = "#66b3ff"
+LABEL_COLOR = "old lace"
 
 CV_WIDE = 1000
 CV_HEIGHT = 800
@@ -28,7 +28,7 @@ CV_COLOUR = 'old lace'
 TEXT_COLOR = "lightblue"
 
 win = Tk()
-canv = Canvas(win, CV_WIDE, CV_HEIGHT, bg=CV_COLOUR)
+canv = Canvas(win, width=CV_WIDE, height=CV_HEIGHT, bg=CV_COLOUR)
 canv.pack(expand=True, fill=BOTH)
 
 OY_LINE = canv.create_line(OY - 1000000, OX, OY + 1000000, OX)
@@ -73,9 +73,9 @@ def init_picture():
 
 def move(dx, dy, axes_move=False, text_move=False):
     global Total_ky, Total_kx, PICTURE_LOG
-    picture_record = [canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
     if (not text_move and win.focus_get() != canv):
         return
+    picture_record = [Total_kx, Total_ky, canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
     pic_copy = []
     if axes_move == True:
         pic_copy.append(ZERO)
@@ -104,7 +104,7 @@ def rotate(angle, xc=None, yc=None, text_rot=False):
         center_coords = canv.coords(PICTURE[0])
         xc = center_coords[0]
         yc = center_coords[1]
-    picture_record = [canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
+    picture_record = [Total_kx, Total_ky, canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
     for obj in PICTURE:
         obj_coords = canv.coords(obj)
         picture_record.append(obj_coords)
@@ -133,7 +133,7 @@ def zoom(kx, ky, xc, yc):
     global PICTURE_LOG
     pic_copy = [ZERO, OX_LINE, OY_LINE]
     pic_copy += PICTURE.copy()
-    picture_record = []
+    picture_record = [Total_kx, Total_ky]
     for obj in pic_copy:
         obj_coords = canv.coords(obj)
         picture_record.append(obj_coords)
@@ -212,9 +212,12 @@ def step_backing(text_rot=False):
         return
     if not len(PICTURE_LOG):
         return
+    print(PICTURE_LOG[-1])
     pic_copy = [ZERO, OX_LINE, OY_LINE] + PICTURE.copy()
+    global Total_kx; Total_kx = PICTURE_LOG[-1][0]
+    global Total_ky; Total_ky = PICTURE_LOG[-1][1]
     for i in range(len(pic_copy)):
-        canv.coords(pic_copy[i], tuple(PICTURE_LOG[-1][i]))
+        canv.coords(pic_copy[i], tuple(PICTURE_LOG[-1][i + 2]))
     PICTURE_LOG.pop()
 
 def aboutprog():
@@ -227,85 +230,85 @@ focus(None)
 win.attributes("-fullscreen", True)
 
 # Center
-center_label = Label(win, text = "Центр(для масштабирования и поворота)", font="-family {Consolas} -size 16", bg = LABEL_COLOR)
+center_label = Label(win, text = "Центр(для масштабирования и поворота)", font="-size 16", bg = LABEL_COLOR)
 center_label.place (x = CV_WIDE + 15, y = 20)
 
-center_x_label = Label(win, text = "X:", font="-family {Consolas} -size 14", bg = LABEL_COLOR)
+center_x_label = Label(win, text = "X:", font="-size 14", bg = LABEL_COLOR)
 center_x_label.place(x = CV_WIDE + 70, y = 50)
-center_x = Entry(win, font="-family {Consolas} -size 14", width = 9)
+center_x = Entry(win, font="-size 14", width = 9)
 center_x.insert(END, "0")
 center_x.place (x = CV_WIDE + 100, y = 50)
 
-center_y_label = Label(win, text = "Y:", font="-family {Consolas} -size 14", bg = LABEL_COLOR)
+center_y_label = Label(win, text = "Y:", font=" -size 14", bg = LABEL_COLOR)
 center_y_label.place(x = CV_WIDE + 270, y = 50)
-center_y = Entry(win, font="-family {Consolas} -size 14", width = 9)
+center_y = Entry(win, font="-size 14", width = 9)
 center_y.insert(END, "0")
 center_y.place (x = CV_WIDE + 300, y = 50)
 
 # Spin
-spin_label = Label(win, text = "Поворот", width = 36, font="-family {Consolas} -size 18", bg = TEXT_COLOR)
-spin_label.place(x = CV_WIDE + 1, y = 110)
+spin_label = Label(win, text = "Поворот", font="-size 18", bg = LABEL_COLOR)
+spin_label.place(x = CV_WIDE + 200, y = 110)
 
-spin_angle_label = Label(win, text = "Угол°: ", font="-family {Consolas} -size 16", bg = LABEL_COLOR)
+spin_angle_label = Label(win, text = "Угол°: ", font="-size 16", bg = LABEL_COLOR)
 spin_angle_label.place(x = CV_WIDE + 160, y = 155)
-spin_angle = Entry(win, font="-family {Consolas} -size 16", width = 9)
+spin_angle = Entry(win, font="-size 16", width = 9)
 spin_angle.insert(END, "0")
 spin_angle.place (x = CV_WIDE + 240, y = 155)
 
-spin_btn = Button(win, text = "Повернуть", font="-family {Consolas} -size 14", command = lambda: rotate_io(), width = 15, height = 2, bg = TEXT_COLOR)
+spin_btn = Button(win, text = "Повернуть", font="-size 14", command = lambda: rotate_io(), width = 15, height = 2)
 spin_btn.place(x = CV_WIDE + 160, y = 200)
 
 # Scale
-scale_label = Label(win, text = "Масштабирование", width = 36, font="-family {Consolas} -size 18", bg = TEXT_COLOR)
-scale_label.place(x = CV_WIDE + 1, y = 300)
+scale_label = Label(win, text = "Масштабирование", font="-size 18", bg = LABEL_COLOR)
+scale_label.place(x = CV_WIDE + 150, y = 300)
 
-scale_x_label = Label(win, text = "kx: ", font="-family {Consolas} -size 16", bg = LABEL_COLOR)
+scale_x_label = Label(win, text = "kx: ", font="-size 16", bg = LABEL_COLOR)
 scale_x_label.place(x = CV_WIDE + 100, y = 360)
-scale_x = Entry(win, font="-family {Consolas} -size 14", width = 9)
+scale_x = Entry(win, font="-size 14", width = 9)
 scale_x.insert(END, "1")
 scale_x.place (x = CV_WIDE + 140, y = 360)
 
-scale_y_label = Label(win, text = "ky: ", font="-family {Consolas} -size 16", bg = LABEL_COLOR)
+scale_y_label = Label(win, text = "ky: ", font="-size 16", bg = LABEL_COLOR)
 scale_y_label.place(x = CV_WIDE + 270, y = 360)
-scale_y = Entry(win, font="-family {Consolas} -size 14", width = 9)
+scale_y = Entry(win, font="-size 14", width = 9)
 scale_y.insert(END, "1")
 scale_y.place (x = CV_WIDE + 310, y = 360)
 
-scale_btn = Button(win, text = "Масштабировать", font="-family {Consolas} -size 14", command = lambda: zoom_io(), width = 15, height = 2, bg = TEXT_COLOR)
+scale_btn = Button(win, text = "Масштабировать", font="-size 14", command = lambda: zoom_io(), width = 15, height = 2)
 scale_btn.place(x = CV_WIDE + 160, y = 420)
 
 # Move
-move_label = Label(win, text = "Перемещение", width = 36, font="-family {Consolas} -size 18", bg = TEXT_COLOR)
-move_label.place(x = CV_WIDE + 1, y = 520)
+move_label = Label(win, text = "Перемещение", font="-size 18", bg = LABEL_COLOR)
+move_label.place(x = CV_WIDE + 170, y = 520)
 
-move_x_label = Label(win, text = "dx: ", font="-family {Consolas} -size 16", bg = LABEL_COLOR)
+move_x_label = Label(win, text = "dx: ", font="-size 16", bg = LABEL_COLOR)
 move_x_label.place(x = CV_WIDE + 100, y = 580)
-move_x = Entry(win, font="-family {Consolas} -size 14", width = 9)
+move_x = Entry(win, font="-size 14", width = 9)
 move_x.insert(END, "0")
 move_x.place (x = CV_WIDE + 140, y = 580)
 
-move_y_label = Label(win, text = "dy: ", font="-family {Consolas} -size 16", bg = LABEL_COLOR)
+move_y_label = Label(win, text = "dy: ", font="-size 16", bg = LABEL_COLOR)
 move_y_label.place(x = CV_WIDE + 270, y = 580)
-move_y = Entry(win, font="-family {Consolas} -size 14", width = 9)
+move_y = Entry(win, font="-size 14", width = 9)
 move_y.insert(END, "0")
 move_y.place (x = CV_WIDE + 310, y = 580)
 
-move_btn = Button(win, text = "Передвинуть", font="-family {Consolas} -size 14", command = lambda: move_io(), width = 15, height = 2, bg = TEXT_COLOR)
+move_btn = Button(win, text = "Передвинуть", font="-size 14", command = lambda: move_io(), width = 15, height = 2)
 move_btn.place(x = CV_WIDE + 160, y = 640)
 
-quit_btn = Button(win, text="Выход",font="-family {Consolas} -size 14", command = lambda: win.quit(), width = 9, height = 2, bg = TEXT_COLOR )
+quit_btn = Button(win, text="Выход",font="-size 14", command = lambda: win.quit(), width = 9, height = 2)
 quit_btn.place(x = CV_WIDE + 1, y = 760)
 
-step_back = Button(win, text = "Шаг назад", font="-family {Consolas} -size 14", command = lambda: step_backing(True), width = 15, height = 2, bg = TEXT_COLOR)
+step_back = Button(win, text = "Шаг назад", font="-size 14", command = lambda: step_backing(True), width = 15, height = 2)
 step_back.place(x = CV_WIDE + 120, y = 760)
 
-clear = Button(win, text = "Сбросить", font="-family {Consolas} -size 14", command = lambda: init_picture(), width = 15, height = 2, bg = TEXT_COLOR)
+clear = Button(win, text = "Сбросить", font="-size 14", command = lambda: init_picture(), width = 15, height = 2)
 clear.place(x = CV_WIDE + 300, y = 760)
 
-credits = Button(win, text = "Об авторе", font="-family {Consolas} -size 8", command = lambda: mb.showinfo(title='Об авторе', message='Золотухин Алексей ИУ7-44Б'), width = 15, height = 2, bg = TEXT_COLOR)
+credits = Button(win, text = "Об авторе", font="-size 8", command = lambda: mb.showinfo(title='Об авторе', message='Золотухин Алексей ИУ7-44Б'), width = 15, height = 2)
 credits.place(x = 10, y = 10)
 
-about_prog = Button(win, text = "О программе", font="-family {Consolas} -size 8", command = lambda: aboutprog, width = 15, height = 2, bg = TEXT_COLOR)
+about_prog = Button(win, text = "О программе", font="-size 8", command = lambda: aboutprog(), width = 15, height = 2)
 about_prog.place(x = 10, y = 55)
 
 
