@@ -12,12 +12,12 @@ Total_ky = 1.0
 ZOOM_IN_EVENT_K = 1.1
 ZOOM_OUT_EVENT_K = 0.9
 MOVE_EVENT_D = 10
-ROT_EVENT_ANGLE = 0.1
+ROT_EVENT_ANGLE = 0.02 * pi
 
 
 PICTURE = []
 PICTURE_LOG = []
-PICTURE_LOG_MAX_LEN = 50
+PICTURE_LOG_MAX_LEN = 100
 
 LABEL_COLOR = "old lace"
 
@@ -121,19 +121,33 @@ def rotate(angle, xc=None, yc=None, text_rot=False):
 def zoom_event(event):
     global Total_ky, Total_kx
     if (event.delta > 0):
-        zoom(ZOOM_IN_EVENT_K, ZOOM_IN_EVENT_K, event.x, event.y)
+        zoom(ZOOM_IN_EVENT_K, ZOOM_IN_EVENT_K, event.x, event.y, axes_scale=True)
         Total_kx *= ZOOM_IN_EVENT_K
         Total_ky *= ZOOM_IN_EVENT_K
     elif (event.delta < 0):
-        zoom(ZOOM_OUT_EVENT_K, ZOOM_OUT_EVENT_K, event.x, event.y)
+        zoom(ZOOM_OUT_EVENT_K, ZOOM_OUT_EVENT_K, event.x, event.y, axes_scale=True)
         Total_kx *= ZOOM_OUT_EVENT_K
         Total_ky *= ZOOM_OUT_EVENT_K
 
-def zoom(kx, ky, xc, yc):
-    global PICTURE_LOG
-    pic_copy = [ZERO, OX_LINE, OY_LINE]
-    pic_copy += PICTURE.copy()
+def zoom(kx, ky, xc=None, yc=None, text_scale=False, axes_scale=False):
+    global Total_ky, Total_kx, PICTURE_LOG
+    if (not text_scale and win.focus_get() != canv):
+        return
+    if xc == None or yc == None:
+        center_coords = canv.coords(ZERO)
+        xc = center_coords[0]
+        yc = center_coords[1]
     picture_record = [Total_kx, Total_ky]
+    if axes_scale == False:
+        picture_record.append(canv.coords(ZERO))
+        picture_record.append(canv.coords(OX_LINE))
+        picture_record.append(canv.coords(OY_LINE))
+    pic_copy = []
+    if axes_scale == True:
+        pic_copy.append(ZERO)
+        pic_copy.append(OX_LINE)
+        pic_copy.append(OY_LINE)
+    pic_copy += PICTURE.copy()
     for obj in pic_copy:
         obj_coords = canv.coords(obj)
         picture_record.append(obj_coords)
@@ -193,7 +207,7 @@ def zoom_io():
         scale_y.delete(0, END)
         return
 
-    zoom(kx, ky, canv.coords(ZERO)[0] + x_c, canv.coords(ZERO)[1] + y_c)
+    zoom(kx, ky, canv.coords(ZERO)[0] + x_c, canv.coords(ZERO)[1] + y_c, text_scale=True)
 
 def move_io():
     try:
@@ -212,10 +226,10 @@ def step_backing(text_rot=False):
         return
     if not len(PICTURE_LOG):
         return
-    print(PICTURE_LOG[-1])
     pic_copy = [ZERO, OX_LINE, OY_LINE] + PICTURE.copy()
     global Total_kx; Total_kx = PICTURE_LOG[-1][0]
     global Total_ky; Total_ky = PICTURE_LOG[-1][1]
+    # print(PICTURE_LOG[-1], '\n', len(pic_copy), len(PICTURE_LOG[-1]))
     for i in range(len(pic_copy)):
         canv.coords(pic_copy[i], tuple(PICTURE_LOG[-1][i + 2]))
     PICTURE_LOG.pop()
@@ -323,6 +337,8 @@ win.bind('<a>', lambda event: move(-MOVE_EVENT_D, 0, True))
 win.bind('<s>', lambda event: move(0, MOVE_EVENT_D, True))
 win.bind('<q>', lambda event: rotate(ROT_EVENT_ANGLE))
 win.bind('<e>', lambda event: rotate(-ROT_EVENT_ANGLE))
+win.bind('<=>', lambda event: zoom(ZOOM_IN_EVENT_K, ZOOM_IN_EVENT_K))
+win.bind('-', lambda event: zoom(ZOOM_OUT_EVENT_K, ZOOM_OUT_EVENT_K))
 win.bind('<BackSpace>', lambda event: step_backing())
 canv.bind('<Button-1>', focus)
 canv.bind('<MouseWheel>', zoom_event)
