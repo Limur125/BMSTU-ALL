@@ -14,6 +14,9 @@ canv.grid(row=0, column=0)
 
 zero = canv.create_oval(0, 0, 0, 0, state=HIDDEN)
 #==========================================================================================
+def rotate_Clockwise(event):
+    print('a')
+
 def str_to_float(str):
     try:
         x = float(str)
@@ -263,6 +266,8 @@ def calculate():
 
 frmpaint = Frame(win)
 frmtext = Frame(win)
+win.bind('<KeyPress-1>', rotate_Clockwise)
+
 circ_btn = Button(frmpaint, text='◯',command=start_circle_draw)
 circ_btn.grid(row=0, column=0)
 

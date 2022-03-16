@@ -31,60 +31,89 @@ win = Tk()
 canv = Canvas(win, width=CV_WIDE, height=CV_HEIGHT, bg=CV_COLOUR)
 canv.pack(expand=True, fill=BOTH)
 
-OY_LINE = canv.create_line(OY - 1000000, OX, OY + 1000000, OX)
-OX_LINE = canv.create_line(OY, OX - 1000000, OY, OX + 1000000)
 ZERO = canv.create_oval(OY, OX, OY, OX, state=HIDDEN)
 
 def init_picture():
     canv.delete(ALL)
     global PICTURE; PICTURE.clear()
     global PICTURE_LOG; PICTURE_LOG.clear()
-    global OY_LINE; OY_LINE = canv.create_line(OY - 1000000, OX, OY + 1000000, OX)
-    global OX_LINE; OX_LINE = canv.create_line(OY, OX - 1000000, OY, OX + 1000000)
     global ZERO; ZERO = canv.create_oval(OY, OX, OY, OX, state=HIDDEN)
     global Total_kx; Total_kx = 1.0
     global Total_ky; Total_ky = 1.0
-
-    PICTURE.append(canv.create_oval(OY, OX - 340, OY, OX - 340, state=HIDDEN))
-    PICTURE.append(canv.create_line(OY + 235, OX, OY + 215, OX - 40, OY + 95, OX - 40, OY + 75, OX, OY + 235, OX, OY + 215, OX))
-    PICTURE.append(canv.create_line(OY - 235, OX, OY - 215, OX - 40, OY - 95, OX - 40, OY - 75, OX, OY - 235, OX, OY - 215, OX))
-    PICTURE.append(canv.create_line(OY + 95, OX - 40, OY + 95, OX - 130, OY + 215, OX - 130, OY + 215, OX - 40))
-    PICTURE.append(canv.create_line(OY - 95, OX - 40, OY - 95, OX - 130, OY - 215, OX - 130, OY - 215, OX - 40))
-    PICTURE.append(canv.create_line(OY + 75, OX - 130, OY + 75, OX - 150, OY + 235, OX - 150, OY + 235, OX - 130, OY + 75, OX - 130))
-    PICTURE.append(canv.create_line(OY - 75, OX - 130, OY - 75, OX - 150, OY - 235, OX - 150, OY - 235, OX - 130, OY - 75, OX - 130))
-    PICTURE.append(canv.create_line(OY + 95, OX - 150, OY + 115, OX - 495, OY + 195, OX - 495, OY + 215, OX - 150))
-    PICTURE.append(canv.create_line(OY - 95, OX - 150, OY - 115, OX - 495, OY - 195, OX - 495, OY - 215, OX - 150))
-    PICTURE.append(canv.create_line(OY - 155, OX - 495, OY - 155, OX - 525, OY + 155, OX - 525, OY + 155, OX - 495, OY - 155, OX - 495))
-    PICTURE.append(canv.create_line(OY - 155, OX - 510, OY + 155, OX - 510))
-    PICTURE.append(canv.create_line(OY - 195, OX - 525, OY - 195, OX - 560, OY + 195, OX - 560, OY + 195, OX - 525, OY - 195, OX - 525))
-    PICTURE.append(canv.create_line(OY - 195, OX - 560, OY, OX - 675, OY + 195, OX - 560))
-
+    x0 = 0
+    y0 = 0
+    global OY_LINE; OY_LINE = [x0 - 1000000, y0, x0 + 1000000, y0]
+    global OX_LINE; OX_LINE = [x0, y0 - 1000000, x0, y0 + 1000000]
+    
+    PICTURE.append([x0, y0 - 340, x0, y0 - 340]) 
+    PICTURE.append([x0 + 235, y0, x0 + 215, y0 - 40, x0 + 95, y0 - 40, x0 + 75, y0, x0 + 235, y0, x0 + 215, y0])
+    PICTURE.append([x0 - 235, y0, x0 - 215, y0 - 40, x0 - 95, y0 - 40, x0 - 75, y0, x0 - 235, y0, x0 - 215, y0])
+    PICTURE.append([x0 + 95, y0 - 40, x0 + 95, y0 - 130, x0 + 215, y0 - 130, x0 + 215, y0 - 40])
+    PICTURE.append([x0 - 95, y0 - 40, x0 - 95, y0 - 130, x0 - 215, y0 - 130, x0 - 215, y0 - 40])
+    PICTURE.append([x0 + 75, y0 - 130, x0 + 75, y0 - 150, x0 + 235, y0 - 150, x0 + 235, y0 - 130, x0 + 75, y0 - 130])
+    PICTURE.append([x0 - 75, y0 - 130, x0 - 75, y0 - 150, x0 - 235, y0 - 150, x0 - 235, y0 - 130, x0 - 75, y0 - 130])
+    PICTURE.append([x0 + 95, y0 - 150, x0 + 115, y0 - 495, x0 + 195, y0 - 495, x0 + 215, y0 - 150])
+    PICTURE.append([x0 - 95, y0 - 150, x0 - 115, y0 - 495, x0 - 195, y0 - 495, x0 - 215, y0 - 150])
+    PICTURE.append([x0 - 155, y0 - 495, x0 - 155, y0 - 525, x0 + 155, y0 - 525, x0 + 155, y0 - 495, x0 - 155, y0 - 495])
+    PICTURE.append([x0 - 155, y0 - 510, x0 + 155, y0 - 510])
+    PICTURE.append([x0 - 195, y0 - 525, x0 - 195, y0 - 560, x0 + 195, y0 - 560, x0 + 195, y0 - 525, x0 - 195, y0 - 525])
+    PICTURE.append([x0 - 195, y0 - 560, x0, y0 - 675, x0 + 195, y0 - 560])
     ellips = []
     for t in linspace(-pi, 0, 100):
-        ellips.append(95 * cos(t) + OY)
-        ellips.append(305 * sin(t) + OX - 150)
-    PICTURE.append(canv.create_line(tuple(ellips)))
+        ellips.append(95 * cos(t) + x0)
+        ellips.append(305 * sin(t) + y0 - 150)
+    PICTURE.append(ellips)
     ellips.clear()
     for t in linspace(-pi + atan(3/4), -atan(3/4), 100):
-        ellips.append(135 * cos(t) + OY)
-        ellips.append(345 * sin(t) + OX - 150)
-    PICTURE.append(canv.create_line(tuple(ellips)))
+        ellips.append(135 * cos(t) + x0)
+        ellips.append(345 * sin(t) + y0 - 150)
+    PICTURE.append(ellips)
+    draw_picture()
 
+def draw_picture():
+    global ZERO
+    x0 = canv.coords(ZERO)[0]
+    y0 = canv.coords(ZERO)[1]
+    canv.delete(ALL)
+    ZERO = canv.create_oval(x0, y0, x0, y0, state=HIDDEN)
+    pic_copy = [OX_LINE, OY_LINE] + PICTURE.copy()
+    for obj in pic_copy:
+        _obj = []
+        for i in range(len(obj) // 2):
+            _obj.append(obj[i * 2] + x0)
+            _obj.append(obj[i * 2 + 1] + y0)
+        canv.create_line(tuple(_obj))
+
+def _move(x, y, dx, dy):
+    x += dx
+    y += dy
+    return x, y
 
 def move(dx, dy, axes_move=False, text_move=False):
-    global Total_ky, Total_kx, PICTURE_LOG
+    global PICTURE_LOG, PICTURE
     if (not text_move and win.focus_get() != canv):
         return
-    picture_record = [Total_kx, Total_ky, canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
-    pic_copy = []
+    picture_record = [canv.coords(ZERO), OX_LINE, OY_LINE]
     if axes_move == True:
-        pic_copy.append(ZERO)
-        pic_copy.append(OX_LINE)
-        pic_copy.append(OY_LINE)
-    pic_copy += PICTURE.copy()
-    for obj in pic_copy:
-        picture_record.append(canv.coords(obj))
-        canv.move(obj, dx * Total_kx, dy * Total_ky)
+        for i in PICTURE:
+            picture_record.append(i)
+        if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
+            PICTURE_LOG = PICTURE_LOG[1:]
+        PICTURE_LOG.append(picture_record)
+        canv.move(ALL, dx, dy)
+        return
+    pic_copy = []
+    for obj_coords in PICTURE:
+        picture_record.append(obj_coords)
+        _obj_coords = []
+        for i in range(len(obj_coords) // 2):
+            _x, _y = _move(obj_coords[i * 2], obj_coords[i * 2 + 1], dx, dy)
+            _obj_coords.append(_x)
+            _obj_coords.append(_y)
+        pic_copy.append(_obj_coords)
+    PICTURE = pic_copy
+    print(PICTURE)
+    draw_picture()
     if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
         PICTURE_LOG = PICTURE_LOG[1:]
     PICTURE_LOG.append(picture_record)
@@ -92,87 +121,79 @@ def move(dx, dy, axes_move=False, text_move=False):
 def _rot(xc, yc, x, y, angle):
     x -= xc
     y -= yc
-    _x = x * cos(angle) + y * sin(angle)
-    _y = -x * sin(angle) + y * cos(angle)
+    _x = x * cos(angle) - y * sin(angle)
+    _y = x * sin(angle) + y * cos(angle)
     return _x + xc, _y + yc
 
 def rotate(angle, xc=None, yc=None, text_rot=False):
-    global PICTURE_LOG
+    global PICTURE_LOG, PICTURE
     if (not text_rot and win.focus_get() != canv):
         return
     if xc == None or yc == None:
-        center_coords = canv.coords(PICTURE[0])
+        center_coords = PICTURE[0]
         xc = center_coords[0]
         yc = center_coords[1]
-    picture_record = [Total_kx, Total_ky, canv.coords(ZERO), canv.coords(OX_LINE), canv.coords(OY_LINE)]
-    for obj in PICTURE:
-        obj_coords = canv.coords(obj)
+    picture_record = [canv.coords(ZERO), OX_LINE, OY_LINE]
+    pic_copy = []
+    for obj_coords in PICTURE:
         picture_record.append(obj_coords)
         _obj_coords = []
         for i in range(len(obj_coords) // 2):
             _x, _y = _rot(xc, yc, obj_coords[i * 2], obj_coords[i * 2 + 1], angle)
             _obj_coords.append(_x)
             _obj_coords.append(_y)
-        canv.coords(obj, tuple(_obj_coords))
+        pic_copy.append(_obj_coords)
+    PICTURE = pic_copy
+    draw_picture()
     if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
         PICTURE_LOG = PICTURE_LOG[1:]
     PICTURE_LOG.append(picture_record)
 
 def zoom_event(event):
-    global Total_ky, Total_kx
     if (event.delta > 0):
         zoom(ZOOM_IN_EVENT_K, ZOOM_IN_EVENT_K, event.x, event.y, axes_scale=True)
-        Total_kx *= ZOOM_IN_EVENT_K
-        Total_ky *= ZOOM_IN_EVENT_K
     elif (event.delta < 0):
         zoom(ZOOM_OUT_EVENT_K, ZOOM_OUT_EVENT_K, event.x, event.y, axes_scale=True)
-        Total_kx *= ZOOM_OUT_EVENT_K
-        Total_ky *= ZOOM_OUT_EVENT_K
 
-def zoom(kx, ky, xc=None, yc=None, text_scale=False, axes_scale=False):
-    global Total_ky, Total_kx, PICTURE_LOG
+def zoom(kx, ky, xc=0, yc=0, text_scale=False, axes_scale=False):
+    global PICTURE_LOG, PICTURE
     if (not text_scale and win.focus_get() != canv):
         return
-    if xc == None or yc == None:
-        center_coords = canv.coords(ZERO)
-        xc = center_coords[0]
-        yc = center_coords[1]
-    picture_record = [Total_kx, Total_ky]
-    if axes_scale == False:
-        picture_record.append(canv.coords(ZERO))
-        picture_record.append(canv.coords(OX_LINE))
-        picture_record.append(canv.coords(OY_LINE))
-    pic_copy = []
+    picture_record = [canv.coords(ZERO), OX_LINE, OY_LINE]
     if axes_scale == True:
-        pic_copy.append(ZERO)
-        pic_copy.append(OX_LINE)
-        pic_copy.append(OY_LINE)
-    pic_copy += PICTURE.copy()
-    for obj in pic_copy:
-        obj_coords = canv.coords(obj)
+        for i in PICTURE:
+            picture_record.append(i)
+        if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
+            PICTURE_LOG = PICTURE_LOG[1:]
+        PICTURE_LOG.append(picture_record)
+        canv.scale(ALL, xc, yc, kx, ky)
+        return
+    pic_copy = []
+    for obj_coords in PICTURE:
         picture_record.append(obj_coords)
         _obj_coords = []
         for i in range(len(obj_coords) // 2):
             _x, _y = _zoom(xc, yc, obj_coords[i * 2], obj_coords[i * 2 + 1], kx, ky)
             _obj_coords.append(_x)
             _obj_coords.append(_y)
-        canv.coords(obj, tuple(_obj_coords))
+        pic_copy.append(_obj_coords)
+    PICTURE = pic_copy
+    print(PICTURE)
+    draw_picture()
     if len(PICTURE_LOG) >= PICTURE_LOG_MAX_LEN:
          PICTURE_LOG = PICTURE_LOG[1:]
     PICTURE_LOG.append(picture_record)
 
 def _zoom(xc, yc, x, y, kx, ky):
-    x -= xc
-    y -= yc
-    _x = x * kx
-    _y = y * ky
-    return _x + xc, _y + yc
+    x = x * kx + (1 - kx) * xc
+    y = y * ky + (1 - ky) * yc
+    return x, y
 
 def rotate_io():
     global Total_kx, Total_ky
     try:
-        x_c = float(center_x.get()) * Total_kx 
-        y_c = -float(center_y.get()) * Total_ky
+        x_c = float(center_x.get())
+        y_c = float(center_y.get()) 
     except:
         mb.showerror("Ошибка", "Неверно введены координаты центра поворота")
         center_x.delete(0, END)
@@ -186,12 +207,12 @@ def rotate_io():
         spin_angle.delete(0, END)
         return
 
-    rotate(angle, canv.coords(ZERO)[0] + x_c, canv.coords(ZERO)[1] + y_c, True)
+    rotate(angle, x_c, y_c, True)
 
 def zoom_io():
     try:
-        x_c = float(center_x.get()) * Total_kx
-        y_c = -float(center_y.get()) * Total_ky
+        x_c = float(center_x.get())
+        y_c = float(center_y.get())
     except:
         mb.showerror("Ошибка", "Неверно введены координаты центра поворота и масштабирования")
         center_x.delete(0, END)
@@ -207,7 +228,7 @@ def zoom_io():
         scale_y.delete(0, END)
         return
 
-    zoom(kx, ky, canv.coords(ZERO)[0] + x_c, canv.coords(ZERO)[1] + y_c, text_scale=True)
+    zoom(kx, ky, x_c, y_c, text_scale=True)
 
 def move_io():
     try:
@@ -222,23 +243,22 @@ def focus(event):
     canv.focus_set()
 
 def step_backing(text_rot=False):
+    global PICTURE
     if (not text_rot and win.focus_get() != canv):
         return
     if not len(PICTURE_LOG):
         return
-    pic_copy = [ZERO, OX_LINE, OY_LINE] + PICTURE.copy()
-    global Total_kx; Total_kx = PICTURE_LOG[-1][0]
-    global Total_ky; Total_ky = PICTURE_LOG[-1][1]
     # print(PICTURE_LOG[-1], '\n', len(pic_copy), len(PICTURE_LOG[-1]))
-    for i in range(len(pic_copy)):
-        canv.coords(pic_copy[i], tuple(PICTURE_LOG[-1][i + 2]))
+    PICTURE = PICTURE_LOG[-1][3:]
     PICTURE_LOG.pop()
+    draw_picture()
 
 def aboutprog():
     mb.showinfo(title='О программе', message='Нарисовать исходный рисунок, затем его переместить,\
 промасштабировать, повернуть')
 
 init_picture()
+draw_picture()
 focus(None)
 
 win.attributes("-fullscreen", True)
@@ -331,10 +351,10 @@ win.bind('<Up>', lambda event: move(0, -MOVE_EVENT_D))
 win.bind('<Right>', lambda event: move(MOVE_EVENT_D, 0))
 win.bind('<Left>', lambda event: move(-MOVE_EVENT_D, 0))
 win.bind('<Down>', lambda event: move(0, MOVE_EVENT_D))
-win.bind('<w>', lambda event: move(0, -MOVE_EVENT_D, True))
-win.bind('<d>', lambda event: move(MOVE_EVENT_D, 0, True))
-win.bind('<a>', lambda event: move(-MOVE_EVENT_D, 0, True))
-win.bind('<s>', lambda event: move(0, MOVE_EVENT_D, True))
+win.bind('<w>', lambda event: move(0, -MOVE_EVENT_D, axes_move=True))
+win.bind('<d>', lambda event: move(MOVE_EVENT_D, 0, axes_move=True))
+win.bind('<a>', lambda event: move(-MOVE_EVENT_D, 0, axes_move=True))
+win.bind('<s>', lambda event: move(0, MOVE_EVENT_D, axes_move=True))
 win.bind('<q>', lambda event: rotate(ROT_EVENT_ANGLE))
 win.bind('<e>', lambda event: rotate(-ROT_EVENT_ANGLE))
 win.bind('<=>', lambda event: zoom(ZOOM_IN_EVENT_K, ZOOM_IN_EVENT_K))
