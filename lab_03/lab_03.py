@@ -419,6 +419,17 @@ def clear_picture():
     ZERO = canv.create_oval(CV_WIDE // 2, CV_HEIGHT // 2, CV_WIDE // 2, CV_HEIGHT // 2, state=HIDDEN)
     SCALING = 1
     
+def aboutprog():
+    messagebox.showinfo(title='О программе', message='Реализовать различные алгоритмы построения одиночных отрезков. Отрезок задается координатой начала, координатой конца и цветом.\n\
+Сравнить визуальные характеристики отрезков, построенных разными алгоритмами, с помощью построения пучка отрезков, с заданным шагом.\n\
+Сравнение со стандартным алгоритмом. Задаются начальные и конечные координаты; рисуется отрезок разными методами. Отрисовка отрезка другим цветом и методом поверх первого, для проверки совпадения. Предоставить пользователю возможность выбора двух цветов – цвета фона и цвета рисования. Алгоритмы выбирать из выпадающего списка.\n\
+- ЦДА\n\
+- Брезенхем действительные числа\n\
+- Брезенхем целые числа\n\
+- Брезенхем с устранением ступенчатости\n\
+- ВУ\n\
+Построение гистограмм по количеству ступенек в зависимости от угла наклона.')
+
 # Method
 
 method_text = Label(win, text = "Алгоритм построения отрезка", width = 43, font="-size 16", bg=WIN_COLOR, fg= FONT_COLOR, )
@@ -493,7 +504,7 @@ angle_text.place(x = CV_WIDE + 370, y = 590)
 angle = Entry(font="-size 14", width = 9)
 angle.place(x = CV_WIDE + 465, y = 590)
 
-draw_spektr_btn = Button(win, text = "Нарисовать", font="-family {Consolas} -size 14", command = lambda: draw_spektr_io(), width = 15)
+draw_spektr_btn = Button(win, text = "Нарисовать", font="-size 14", command = lambda: draw_spektr_io(), width = 15)
 draw_spektr_btn.place(x = CV_WIDE + 210, y = 640)
 
 # Control buttons
@@ -507,6 +518,13 @@ clear_win_btn.place(x = CV_WIDE + 210, y = 720)
 
 exit_btn = Button(win, text = "Выход", font="-size 15", command = lambda: win.quit(), width = 15, height=2)
 exit_btn.place(x = CV_WIDE + 20, y = 720)
+
+
+credits = Button(win, text = "Об авторе", font="-size 8", command = lambda: messagebox.showinfo(title='Об авторе', message='Золотухин Алексей ИУ7-44Б'), width = 15, height = 2)
+credits.place(x = 10, y = 10)
+
+about_prog = Button(win, text = "О программе", font="-size 8", command = lambda: aboutprog(), width = 15, height = 2)
+about_prog.place(x = 10, y = 55)
 
 canv.bind('<MouseWheel>', zoom)
 
