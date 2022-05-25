@@ -55,32 +55,45 @@ def param_ellips(xc, yc, a, b, color):
 
 def brez_ellips(xc, yc, a, b, color):
     ellips = []
+
+    pow_a = a * a
+    pow_b = b * b
+
+    limit = round(a / sqrt(1 + pow_b / pow_a)) # производная для ограничения
+
     x = 0
     y = b
-    a_sqr = a * a
-    b_sqr = b * b
-    delta = 4 * b_sqr * (1 - a_sqr) + a_sqr * ((2 * y - 1) * (2 * y - 1)) 
-    while a_sqr * 2 * y - 1 > 2 * b_sqr * x + 1:
-        ellips.append([x, y, color])
-        if delta < 0:
-            x += 1
-            delta += 4 * b_sqr * (2 * x + 3)
-        else:
-            x += 1
-            delta = delta - 8 * a_sqr * (y - 1) + 4 * b_sqr * (2 * x + 3)
-            y -= 1
+    ellips.append([x, y, color]) 
 
-    delta = b_sqr * ((2 * x + 1) * (2 * x + 1)) + 4 * a_sqr * ((y + 1) * (y + 1)) - 4 * a_sqr * b_sqr
-    while y >= 0:
-        ellips.append([x, y, color])
-        if delta < 0:
+    func = pow_b - round(pow_a * (b - 1 / 4)) 
+    
+    # 1 участок
+    while x <= limit:
+        if func > 0: # диагональ
             y -= 1
-            delta += 4 * a_sqr * (2 * y + 3)
-        else:
-            y -= 1
-            delta = delta - 8 * b_sqr * (x + 1) + 4 * a_sqr * (2 * y + 3)
-            x += 1
+            func -= pow_a * y * 2
 
+        x += 1
+        func += pow_b * (x + x + 1)
+        ellips.append([x, y, color]) 
+
+    limit = round(b / sqrt(1 + pow_a / pow_b)) # производная для ограничения
+
+    x = a
+    y = 0
+    ellips.append([x, y, color]) 
+
+    func = pow_a - round(pow_b * (x - 1 / 4))  
+
+    # 2 участок
+    while y <= limit:
+        if func > 0: # диагональ
+            x -= 1
+            func -= 2 * pow_b * x
+
+        y += 1
+        func += pow_a * (y + y + 1)
+        ellips.append([x, y, color]) 
     return ellips
 
 def mid_point_ellips(xc, yc, a, b, color):
@@ -92,7 +105,7 @@ def mid_point_ellips(xc, yc, a, b, color):
     f = 0
     ellips = []
 
-    while x <= x_edge:
+    while x < x_edge:
         ellips.append([x, y, color])
         df = b * b * (2 * x  + 1)
         x += 1

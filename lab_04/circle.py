@@ -32,17 +32,17 @@ def canon_circle(xc, yc, r, color):
         circle.append([x, y, color])
         x += 1
 
-    while (y >= 0):
-        x = round(sqrt(r * r - (y - yc) * (y - yc)) + xc)
-        circle.append([x, y, color])
-        y -= 1
+    # while (y >= 0):
+    #     x = round(sqrt(r * r - (y - yc) * (y - yc)) + xc)
+    #     circle.append([x, y, color])
+    #     y -= 1
     return circle
 
 def param_circle(xc, yc, r, color):
     step = 1 / r
     circle = []
     t = 0
-    while (t < pi / 2 + step):
+    while (t < pi / 4 + step):
         x = round(r * cos(t))
         y = round(r * sin(t))
         circle.append([x, y, color])
@@ -53,9 +53,10 @@ def brez_circle(xc, yc, r, color):
     circle = []
     x = 0
     y = r
-    delta = 1 - 2 * r
+    edge = round(r /sqrt(2))
+    delta = 2 - 2 * r
     error = 0
-    while y >= 0:
+    while y >= edge:
         circle.append([x, y, color])
         error = 2 * (delta + y) - 1
         if delta < 0 and error < 0:
@@ -68,39 +69,21 @@ def brez_circle(xc, yc, r, color):
             delta = delta + (1 - 2 * y)
             continue
         x += 1
-        delta = delta + (2 * (x - y))
         y -= 1
+        delta = delta + (2 * (x - y)) + 2
     return circle
 
 def mid_point_circle(xc, yc, r, color):
-    x = 0
-    y = r
-
-    x_edge = round(r / sqrt(2))
-
-    f = 0
     circle = []
-
-    while x <= x_edge:
+    x = 0 
+    y = r
+    d = 1 - r 
+    while x <= y:
         circle.append([x, y, color])
-        df = r * r * (2 * x  + 1)
         x += 1
-
-        if (f < 0):
-            f = f + df
-        else: 
-            f = f + df - 2 * r * r * y
+        if d < 0:
+            d += 2 * x + 1
+        else:
             y -= 1
-    
-    f = f + (r * r - r * r * r + r * r / 4)
-    while y >= 0:
-        circle.append([x, y, color])
-        df = r * r * (-2 * y + 1)
-        y -= 1
-
-        if f > 0:
-            f = f + df
-        else: 
-            f = f + df + 2 * r * r * x
-            x += 1
+            d += 2 * (x - y) + 1
     return circle

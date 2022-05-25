@@ -23,7 +23,7 @@ BTN_TEXT_COLOR = "#4d94ff"
 BOX_COLOR = "#dab3ff"
 BOX_WIDTH = 50
 
-NUMBER_OF_RUNS = 20
+NUMBER_OF_RUNS = 100
 MAX_RADIUS = 10000
 STEP = 1000
 
@@ -40,7 +40,36 @@ ZERO = canv.create_oval(CV_WIDE // 2, CV_HEIGHT // 2, CV_WIDE // 2, CV_HEIGHT //
 def rgb_to_hex(rgb):
     return f'#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}'
 
-def render_figure(coords):
+def render_circle(coords):
+    x0 = canv.coords(ZERO)[0]
+    y0 = canv.coords(ZERO)[1]
+    for pixel in coords: 
+        x = pixel[0] * SCALING + x0
+        y = -pixel[1] * SCALING + y0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        x = pixel[0] * SCALING + x0
+        y = pixel[1] * SCALING + y0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        x = -pixel[0] * SCALING + x0
+        y = pixel[1] * SCALING + y0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        x = -pixel[0] * SCALING + x0
+        y = -pixel[1] * SCALING + y0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        y = pixel[0] * SCALING + y0
+        x = pixel[1] * SCALING + x0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        y = pixel[0] * SCALING + y0
+        x = -pixel[1] * SCALING + x0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        y = -pixel[0] * SCALING + y0
+        x = pixel[1] * SCALING + x0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        y = -pixel[0] * SCALING + y0
+        x = -pixel[1] * SCALING + x0
+        canv.create_polygon(x, y , x + SCALING, y, x + SCALING, y + SCALING, x, y + SCALING, fill=rgb_to_hex(pixel[2]))
+        
+def render_ellips(coords):
     x0 = canv.coords(ZERO)[0]
     y0 = canv.coords(ZERO)[1]
     for pixel in coords: 
@@ -66,12 +95,12 @@ def figure_io(method, color, figure):
             case 1:
                 r = float(rad_circle_entry.get())
                 coords = draw_circle(x_c, y_c, r, method, color)
-                render_figure(coords)
+                render_circle(coords)
             case 2:
                 r_a = float(rad_a_ellips_entry.get())
                 r_b = float(rad_b_ellips_entry.get())
                 coords = draw_ellips(x_c, y_c, r_a, r_b, method, color)
-                render_figure(coords)
+                render_ellips(coords)
     except:
         messagebox.showerror("Ошибка", "Неверно данные")
 
@@ -88,7 +117,7 @@ def spektr_io(method, color, figure):
                 step = float(rad_step_crcl_entry.get())
                 for i in range(n):
                     coords = draw_circle(x_c, y_c, r, method, color)
-                    render_figure(coords)
+                    render_circle(coords)
                     r += step
             case 2:
                 r_a = float(rad_a_elps_entry.get())
@@ -98,7 +127,7 @@ def spektr_io(method, color, figure):
                 step = float(rad_step_elps_entry.get())
                 for i in range(n):
                     coords = draw_ellips(x_c, y_c, r_a, r_b, method, color)
-                    render_figure(coords)
+                    render_ellips(coords)
                     r_b += step * c
                     r_a += step
     except:
@@ -109,48 +138,26 @@ def spektr_io(method, color, figure):
 def time_io(figure):
     time_res = []
     try:
-        x_c = float(xc_fig_entry.get())
-        y_c = float(yc_fig_entry.get())
-        match figure:
-            case 1:
-                name = "окружность"
-                _r = float(rad_begin_crcl_entry.get())
-                n = int(amount_crcl_entry.get())
-                step = float(rad_step_crcl_entry.get())
-                for method in range(4):
-                    time_start = [0] * n
-                    time_end = [0] * n
-                    for _ in range(NUMBER_OF_RUNS):
-                        r = _r
-                        for k in range(n):  
-                            time_start[k] += time.time()
-                            draw_circle(x_c, y_c, r, method, 0)
-                            time_end[k] += time.time()
-                            r += step
-                    size = len(time_start)
-                    res_time = list((time_end[j] - time_start[j]) / NUMBER_OF_RUNS for j in range(size))
-                    time_res.append(res_time) 
-            case 2:
-                name = "эллипс"
-                r_a = float(rad_a_elps_entry.get())
-                _r = r_a
-                r_b = float(rad_b_elps_entry.get())
-                c = r_b / r_a
-                n = int(amount_elps_entry.get())
-                step = float(rad_step_elps_entry.get())
-                for method in range(4):
-                    time_start = [0] * n
-                    time_end = [0] * n
-                    for _ in range(NUMBER_OF_RUNS):
-                        for k in range(n):  
-                            time_start[k] += time.time()
-                            draw_ellips(x_c, y_c, r_a, r_b, method, 0)
-                            time_end[k] += time.time()
-                            r_b += step * c
-                            r_a += step  
-                    size = len(time_start)
-                    res_time = list((time_end[j] - time_start[j]) / NUMBER_OF_RUNS for j in range(size))
-                    time_res.append(res_time)                
+        x_c = 0
+        y_c = 0
+
+        name = "окружность"
+        _r = 1
+        n = 1000
+        step = 1
+        for method in range(4):
+            time_start = [0] * n
+            time_end = [0] * n
+            for _ in range(NUMBER_OF_RUNS):
+                r = _r
+                for k in range(n):  
+                    time_start[k] += time.time()
+                    draw_circle(x_c, y_c, r, method, 0)
+                    time_end[k] += time.time()
+                    r += step
+            size = len(time_start)
+            res_time = list((time_end[j] - time_start[j]) / NUMBER_OF_RUNS for j in range(size))
+            time_res.append(res_time)            
     except:
        messagebox.showerror("Ошибка", "Неверно данные")
     print(time_res)
@@ -161,7 +168,7 @@ def time_io(figure):
     plt.plot(rad_arr, time_res[1], label = "Параметрическое\nуравнение")
     plt.plot(rad_arr, time_res[2], label = "Брезенхем")
     plt.plot(rad_arr, time_res[3], label = "Алгоритм\nсредней точки")
-    plt.xticks(np.arange(_r, _r + n * step, step))
+    # plt.xticks(np.arange(_r, _r + n * step, step))
     plt.legend()
     plt.ylabel("Время")
     plt.xlabel("Величина радиуса")
@@ -254,10 +261,10 @@ color_text.place(x = CV_WIDE + 20, y = 20)
 option_figure = IntVar()
 option_figure.set(1)
 
-figure_circle = Radiobutton(text = "Окружность", font="-size 14", variable = option_figure, value = 1, bg = WIN_COLOR, fg=FONT_COLOR, activebackground=WIN_COLOR, command = lambda: change_figure(option_figure.get()))
+figure_circle = Radiobutton(text = "Окружность", font="-size 14", variable = option_figure, value = 1, bg = WIN_COLOR, fg=FONT_COLOR, activebackground=WIN_COLOR, highlightbackground = WIN_COLOR, command = lambda: change_figure(option_figure.get()))
 figure_circle.place(x = CV_WIDE + 25, y = 55)
 
-figure_ellips = Radiobutton(text = "Эллипс", font="-size 14", variable = option_figure, value = 2, bg = WIN_COLOR, fg=FONT_COLOR, activebackground=WIN_COLOR, command = lambda: change_figure(option_figure.get()))
+figure_ellips = Radiobutton(text = "Эллипс", font="-size 14", variable = option_figure, value = 2, bg = WIN_COLOR, fg=FONT_COLOR, activebackground=WIN_COLOR, highlightbackground = WIN_COLOR, command = lambda: change_figure(option_figure.get()))
 figure_ellips.place(x = CV_WIDE + 400, y = 55)
 
 # Method

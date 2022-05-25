@@ -1,7 +1,5 @@
 from tkinter import *
 from tkinter import messagebox, ttk
-from math import sqrt, acos, degrees, pi, sin, cos, radians, floor, fabs
-import copy
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -18,7 +16,7 @@ WIN_COLOR = 'dark slate gray'
 
 CV_WIDE = 900
 CV_HEIGHT = 900
-CV_COLOR = rgb_to_hex((253, 245, 230)) #f3e6ff" #"#cce6ff"
+CV_COLOR = "#000000" #rgb_to_hex((253, 245, 230)) #f3e6ff" #"#cce6ff"
 MAIN_TEXT_COLOR = "#b566ff" #"lightblue" a94dff
 FONT_COLOR = 'linen'
 
@@ -37,13 +35,59 @@ win.geometry("%dx%d" %(WIN_WIDTH, WIN_HEIGHT))
 win.attributes("-fullscreen", True)
 
 canv = Canvas(win, width = CV_WIDE, height = CV_HEIGHT, bg = CV_COLOR)
+canv.place(x = 0, y = 0)
 
 canv.delete("all")
 
-image_canvas = PhotoImage(width = CV_WIDE, height = CV_HEIGHT, palette=CV_COLOR)
-canv.create_image((CV_WIDE / 2, CV_HEIGHT / 2), image = image_canvas, state = NORMAL)
+image_canvas = PhotoImage(width = CV_WIDE + 100, height = CV_HEIGHT + 100)
+canv.create_image((CV_WIDE // 2 + 50, CV_HEIGHT // 2 + 50) , image = image_canvas, state = NORMAL)
+print(image_canvas.get(450, 450))
 
-canv.place(x = 0, y = 0)
+
+def sign(a):
+    if (a < 0):
+        return -1
+    elif (a == 0):
+        return 0
+    else:
+        return 1
+
+def brez_int(x1, y1, x2, y2, color):
+    x = x1
+    y = y1
+    dx = x2 - x1
+    dy = y2 - y1
+    sx = sign(dx)
+    sy = sign(dy)
+    dx = abs(dx)
+    dy = abs(dy)
+    obmen = 0
+    if dx < dy:
+        obmen = 1
+        dx, dy = dy, dx
+    e = 2 * dy - dx
+    points = []
+    for _ in range (0, int(dx) + 1):
+        points.append([x, y, color])
+        if e >= 0:
+            if obmen == 1:
+                x += sx
+            else:
+                y += sy
+            e = e - 2 * dx
+        if obmen == 1:
+            y += sy
+        else:
+            x += sx
+        e = e + 2 * dy
+    return points
+
+def render_line(coords):
+    for point in coords:
+        x = point[0]
+        y = point[1]
+        c = point[2]
+        image_canvas.put(rgb_to_hex(c), to=(x, y))
 
 def point_io():
     try:
@@ -63,7 +107,6 @@ def add_dot_click(event):
 def add_dot(x, y):
     global LINES, FIRST_POINT, LOG
     LOG.append([LINES, FIRST_POINT])
-    print(LOG)
     if len(LINES) == 0 or len((LINES[-1])[-1]) > 1:
         LINES.append([])
         FIRST_POINT = [x, y]
@@ -71,7 +114,8 @@ def add_dot(x, y):
         ((LINES[-1])[-1]).append([x, y])
     LINES[-1].append([[x, y]])
     if len(LINES[-1]) > 1:
-        canv.create_line(tuple((LINES[-1])[-2]))
+        l = brez_int((LINES[-1])[-2][0][0], (LINES[-1])[-2][0][1], (LINES[-1])[-2][1][0], (LINES[-1])[-2][1][1], (255, 255, 255))
+        render_line(l)
 
 def close_dot_click(event):
     close_lines()
@@ -81,10 +125,19 @@ def close_lines():
     LOG.append([LINES.copy(), FIRST_POINT])
     if len((LINES[-1])[-1]) < 2:
         ((LINES[-1])[-1]).append(FIRST_POINT)
-        canv.create_line(tuple((LINES[-1])[-1]))
+        l = brez_int((LINES[-1])[-1][0][0], (LINES[-1])[-1][0][1], (LINES[-1])[-1][1][0], (LINES[-1])[-1][1][1], (255, 255, 255))
+        render_line(l)
 
-def fill_io(color_i, delay):
+def fill_io(event, color_i, delay):
     canv.update()
+    if delay == 1:
+        d = True
+    else:
+        d = False
+
+    x = int(event.x)
+    y = int(event.y)
+
     for line in LINES:
         for point in line:
             if len(point) != 2:
@@ -97,47 +150,9 @@ def fill_io(color_i, delay):
             color = (255, 0, 0)
         case 2:
             color = (0, 255, 0)
-    start = time()
-    for line in LINES:
-        for i in range(len(line)):
-            x1 = line[i][0][0]
-            x2 = line[i][1][0]
-            y1 = line[i][0][1]
-            y2 = line[i][1][1]
-
-            coords = cda(x1, y1, x2, y2)
-            if line[i - 1][0][1] > y1 and y1 > y2:
-                coords.pop(0)
-            if line[i - 1][0][1] <= y1 and y1 <= y2:
-                coords.pop(0)
-            for point in coords:
-                if len(point) == 1:
-                    continue
-                y = point[1]
-                for x in range(point[0], CV_WIDE):
-                    tmp = image_canvas.get(x, y)
-                    if image_canvas.get(x, y) != color:
-                        image_canvas.put(rgb_to_hex(color), to=(x, y))
-                    else:
-                        image_canvas.put(CV_COLOR, to=(x, y))
-                if delay == 1:
-                    canv.update()
-                    res = time() - start
-                    time_label.configure(text='Время: {:.2f} с'.format(res))
-    res = time() - start
-    time_label.configure(text='Время: {:.2f} с'.format(res))
-    
+    fill_func(x, y, color, d)
 
 
-def cda(x1, y1, x2, y2):
-    l = fabs(y1 - y2)
-    if not l:
-        return [[x1, y1]]
-    dx = (x2 - x1) / l
-    dy = (y2 - y1) / l
-    l = int(l)
-    points = [[round(x1 + dx * i), round(y1 + dy * i)] for i in range(0, l + 1)]
-    return points
 
 
 def reboot_prog():
@@ -168,7 +183,81 @@ def cancel_action():
         for line in fig:
             print(line)
             if len(line) == 2:
-                canv.create_line(tuple(line))
+                l = canv.create_line(tuple(line))
+
+def fill_func(xs, ys, fill_c, delay = 0):
+    start = time()
+    stack = []
+    stack.append((xs, ys))
+    while len(stack) > 0:
+        # print(stack)
+        point = stack.pop()
+        x = point[0]
+        y = point[1]
+        if x < 0 or x > CV_WIDE or y < 0 or y > CV_HEIGHT:
+            continue
+        pix_color = image_canvas.get(x, y)
+        while pix_color != (255, 255, 255) and x > 0:
+            image_canvas.put(rgb_to_hex(fill_c), to=(x, y))
+            x -= 1
+            pix_color = image_canvas.get(x, y)
+        x_left = x + 1
+        x = point[0]
+        pix_color = image_canvas.get(x, y)
+        while pix_color != (255, 255, 255) and x < CV_WIDE:
+            image_canvas.put(rgb_to_hex(fill_c), to=(x, y))
+            x += 1
+            pix_color = image_canvas.get(x, y)
+        x_right = x - 1
+        x = x_left
+        flag = False
+        while x <= x_right:
+            pix_color = image_canvas.get(x, y + 1)
+            while pix_color != (255, 255, 255) and pix_color != fill_c and x <= x_right:
+                flag = True
+                x += 1
+                pix_color = image_canvas.get(x, y + 1)
+            if flag:
+                if x == x_right and pix_color != (255,255,255) and pix_color != fill_c and y + 1 < CV_HEIGHT:
+                    stack.append((x, y + 1)) 
+                else:
+                    stack.append((x - 1, y + 1))
+                flag = False
+            x_start = x
+
+            while (pix_color == (255,255,255) or pix_color == fill_c) and x < x_right:
+                x += 1
+                pix_color = image_canvas.get(x, y + 1)
+            if x == x_start:
+                x += 1
+        x = x_left
+        flag = False
+        while x <= x_right:
+            pix_color = image_canvas.get(x, y - 1)
+            while pix_color != (255,255,255) and pix_color != fill_c and x <= x_right:
+                flag = True
+                x += 1
+                pix_color = image_canvas.get(x, y - 1)
+
+            if flag:
+                if x == x_right and pix_color != (255,255,255) and pix_color != fill_c and y - 1 > 0:
+                    stack.append((x, y - 1))
+                else:
+                    stack.append((x - 1, y - 1))
+                flag = False
+
+            x_start = x
+            while (pix_color == (255,255,255) or pix_color == fill_c) and x < x_right:
+                x += 1
+                pix_color = image_canvas.get(x, y - 1)
+
+            if x == x_start:
+                x += 1
+        if delay == 1:
+            canv.update()
+            res = time() - start
+            time_label.configure(text='Время: {:.2f} с'.format(res))
+    time_label.configure(text='Время: {:.2f} с'.format(time() - start))
 
 def config_rbs(a):
     match a:
@@ -227,8 +316,8 @@ draw_delay.place(x = CV_WIDE + 25, y = 410)
 draw_without_delay = Radiobutton(text = "Без задержки", font="-size 14", variable = option_filling, value = 2, indicatoron=True, bg = WIN_COLOR, fg=FONT_COLOR, activebackground=WIN_COLOR, highlightbackground = WIN_COLOR, command=lambda: config_rbs(1))
 draw_without_delay.place(x = CV_WIDE + 350, y = 410)
 
-fill_figure_btn = Button(win, text = "Закрасить выбранную область", font="-size 14", command = lambda: fill_io(color_cmbb.current(), option_filling.get()))
-fill_figure_btn.place(x = CV_WIDE + 150, y = 460)
+# fill_figure_btn = Button(win, text = "Закрасить выбранную область", font="-size 14", command = lambda: fill_io(color_cmbb.current(), option_filling.get()))
+# fill_figure_btn.place(x = CV_WIDE + 150, y = 460)
 
 # Time and clear
 
@@ -251,7 +340,8 @@ about_prog = Button(win, text = "О программе", font="-size 8", command
 about_prog.place(x = 10, y = 55)
 
 canv.bind("<1>", add_dot_click)
-canv.bind("<3>", close_dot_click)
+win.bind("<space>", close_dot_click)
+canv.bind("<3>", lambda event: fill_io(event, color_cmbb.current(), option_filling.get()))
 
 
 win.mainloop()
