@@ -22,8 +22,6 @@ FONT_COLOR = 'linen'
 
 BTN_TEXT_COLOR = "#4d94ff"
 
-BOX_COLOR = "#dab3ff"
-BOX_WIDTH = 50
 
 LINES = []
 FIRST_POINT = []

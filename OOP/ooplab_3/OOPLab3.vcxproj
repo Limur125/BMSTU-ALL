@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{02C40CE5-CBD1-4E1C-9353-D2B9260C6F57}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\msys64\home\zolot\OOP\lab_3\build-OOPLab3-Desktop_Qt_MinGW_w64_64bit_MSYS2-Debug;C:\msys64\mingw64\include\QtGui;C:\msys64\mingw64\include;C:\msys64\mingw64\include\QtCore;C:\msys64\mingw64\include\QtWidgets;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\msys64\mingw64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ooplab3\AbstractFactory.cpp" />
+    <ClCompile Include="OOPLab3\Actions.cpp" />
+    <ClCompile Include="OOPLab3\Camera.cpp" />
+    <ClCompile Include="OOPLab3\Composite.cpp" />
+    <ClCompile Include="OOPLab3\Drawer.cpp" />
+    <ClCompile Include="OOPLab3\DrawerDirector.cpp" />
+    <ClCompile Include="OOPLab3\DrawManager.cpp" />
+    <ClCompile Include="OOPLab3\Exceptions.cpp" />
+    <ClCompile Include="OOPLab3\Facade.cpp" />
+    <ClCompile Include="OOPLab3\Figure.cpp" />
+    <ClCompile Include="OOPLab3\FigureBuilder.cpp" />
+    <ClCompile Include="OOPLab3\FigureDirector.cpp" />
+    <ClCompile Include="OOPLab3\FileLoader.cpp" />
+    <ClCompile Include="OOPLab3\Link.cpp" />
+    <ClCompile Include="OOPLab3\LoadManager.cpp" />
+    <ClCompile Include="ooplab3\main.cpp" />
+    <ClCompile Include="ooplab3\mainwindow.cpp" />
+    <ClCompile Include="OOPLab3\Point.cpp" />
+    <ClCompile Include="OOPLab3\Scene.cpp" />
+    <ClCompile Include="OOPLab3\SceneManager.cpp" />
+    <ClCompile Include="OOPLab3\Visitor.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="build-OOPLab3-Desktop_Qt_MinGW_w64_64bit_MSYS2-Debug\ui_mainwindow.h" />
+    <ClInclude Include="ooplab3\AbstractFactory.h" />
+    <ClInclude Include="OOPLab3\Actions.h" />
+    <ClInclude Include="OOPLab3\BaseFigureBuilder.h" />
+    <ClInclude Include="OOPLab3\BaseFigureLoader.h" />
+    <ClInclude Include="OOPLab3\BaseManager.h" />
+    <ClInclude Include="OOPLab3\BaseObject.h" />
+    <ClInclude Include="OOPLab3\BaseVisitor.h" />
+    <ClInclude Include="OOPLab3\Camera.h" />
+    <ClInclude Include="OOPLab3\Composite.h" />
+    <ClInclude Include="OOPLab3\Drawer.h" />
+    <ClInclude Include="OOPLab3\DrawerDirector.h" />
+    <ClInclude Include="OOPLab3\DrawManager.h" />
+    <ClInclude Include="OOPLab3\Exceptions.h" />
+    <ClInclude Include="OOPLab3\Facade.h" />
+    <ClInclude Include="OOPLab3\Figure.h" />
+    <ClInclude Include="OOPLab3\FigureBuilder.h" />
+    <ClInclude Include="OOPLab3\FigureDirector.h" />
+    <ClInclude Include="OOPLab3\FileLoader.h" />
+    <ClInclude Include="OOPLab3\Link.h" />
+    <ClInclude Include="OOPLab3\LoadManager.h" />
+    <ClInclude Include="ooplab3\mainwindow.h" />
+    <ClInclude Include="OOPLab3\Point.h" />
+    <ClInclude Include="OOPLab3\Scene.h" />
+    <ClInclude Include="OOPLab3\SceneManager.h" />
+    <ClInclude Include="OOPLab3\SourceLoader.h" />
+    <ClInclude Include="OOPLab3\Transformations.h" />
+    <ClInclude Include="OOPLab3\Visitor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OOPLab3\mainwindow.ui" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

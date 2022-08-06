@@ -391,9 +391,6 @@ def sutherland_hodgman_algorythm(cutter_line, position, prev_result):
 
     return cur_result
 
-
-# TODO
-
 def cut_area():
 
     if (not is_maked(cutter)):

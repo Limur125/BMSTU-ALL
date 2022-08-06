@@ -1,1 +1,6 @@
 *.exe
+*.pyc
+.vs
+.vscode
+*build*
+x64

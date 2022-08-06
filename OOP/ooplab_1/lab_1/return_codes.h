@@ -1,0 +1,16 @@
+#ifndef RETURN_CODES_H
+#define RETURN_CODES_H
+
+enum ret_code
+{
+    OK,
+    FILE_OPEN_ERROR,
+    FILE_FORMAT_ERROR,
+    MEMORY_ERROR,
+    NO_POINTS,
+    NO_LINKS,
+    UNKNOWN_COMMAND,
+    SCENE_ERROR
+};
+
+#endif // RETURN_CODES_H
