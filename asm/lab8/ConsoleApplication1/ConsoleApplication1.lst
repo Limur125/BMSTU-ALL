@@ -1,0 +1,67 @@
+Microsoft (R) Macro Assembler Version 14.31.31105.0	    04/20/22 10:31:39
+strcopy.asm						     Page 1 - 1
+
+
+				.686
+				.MODEL FLAT, C
+				.STACK
+ 00000000			.CODE
+ 00000000			strcopy PROC
+ 00000000  8B F1		    mov esi, ecx
+ 00000002  8B FA		    mov edi, edx
+ 00000004  8B C8		    mov ecx, eax
+ 00000006  3B FE		    cmp edi, esi
+ 00000008  7C 07		    jl simple_copy
+ 0000000A  FD			        std
+ 0000000B  03 F1		        add esi, ecx
+ 0000000D  03 F9		        add edi, ecx
+ 0000000F  4E			        dec esi
+ 00000010  4F			        dec edi
+ 00000011			    simple_copy:
+ 00000011  F3/ A4		    rep movsb
+ 00000013  FC			    cld
+ 00000014  8B C7		    mov eax, edi
+ 00000016  C3			    ret
+ 00000017			strcopy ENDP
+
+				END
+Microsoft (R) Macro Assembler Version 14.31.31105.0	    04/20/22 10:31:39
+strcopy.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+STACK  . . . . . . . . . . . . .	32 Bit	 00000400 Para	  Stack	  'STACK'	 
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000017 Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+strcopy  . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000017 Public C
+  simple_copy  . . . . . . . . .	L Near	 00000011 _TEXT	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000001h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+
+	   0 Warnings
+	   0 Errors
