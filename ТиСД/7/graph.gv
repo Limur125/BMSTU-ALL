@@ -1,0 +1,40 @@
+digraph graph_1 {
+subgraph Graph_1 {
+g1_0 -> g1_1 [label=5];
+g1_0 -> g1_2 [label=30];
+g1_0 -> g1_3 [label=7];
+g1_1 -> g1_0 [label=1];
+g1_1 -> g1_2 [label=10];
+g1_1 -> g1_3 [label=7];
+g1_2 -> g1_0 [label=3];
+g1_2 -> g1_1 [label=1];
+g1_2 -> g1_3 [label=6];
+g1_3 -> g1_0 [label=8];
+g1_3 -> g1_1 [label=2];
+g1_3 -> g1_2 [label=6];
+g1_3 -> g1_4 [label=1];
+g1_4 -> g1_3 [label=1];
+}
+subgraph Graph_2 {
+g2_0 -> g2_1 [label=5];
+g2_0 -> g2_2 [label=13];
+g2_0 -> g2_3 [label=7];
+g2_0 -> g2_4 [label=8];
+g2_1 -> g2_0 [label=1];
+g2_1 -> g2_2 [label=10];
+g2_1 -> g2_3 [label=7];
+g2_1 -> g2_4 [label=8];
+g2_2 -> g2_0 [label=2];
+g2_2 -> g2_1 [label=1];
+g2_2 -> g2_3 [label=6];
+g2_2 -> g2_4 [label=7];
+g2_3 -> g2_0 [label=3];
+g2_3 -> g2_1 [label=2];
+g2_3 -> g2_2 [label=6];
+g2_3 -> g2_4 [label=1];
+g2_4 -> g2_0 [label=4];
+g2_4 -> g2_1 [label=3];
+g2_4 -> g2_2 [label=7];
+g2_4 -> g2_3 [label=1];
+}
+}

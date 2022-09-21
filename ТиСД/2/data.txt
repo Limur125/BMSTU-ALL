@@ -1,0 +1,254 @@
+40
+Fokin
+Nikolay
++74965616539
+Oatmeal 3rd ave, house 27,39
+personal
+12.12.1988
+Krasnova
+Renata
++74965643512
+Ogorodny 1st, house 89, 21
+official
+sales consultant
+Pyaterochka
+Tolkachev
+Anton
++74965613374
+Machine tool 3rd passage, house 34, 149
+personal
+24.08.2000
+Druzhinina
+Christina
++74965666488
+Mulberry 11th passage, house 128, 249
+personal
+13.02.1999
+Cusin
+Ivan
++74965665866
+Omsk st, house 173, 280
+official
+senior mechanic
+Plant No. 45
+Vladimir
+Alina
++74965613949
+Pugachevskaya st, house 82, 261
+personal
+17.10.1965
+Hooks
+Kirill
++74965679382
+Kazachya B. st, house 92, 83
+personal
+02.05.2006
+Kamenskaya
+Snezhana
++74965643273
+S.I. Steinberg st, house 190, 208
+personal
+28.02.2001
+Dmitry
+Leontiev
++74965676310
+Pesochnaya 2nd st, house 163, 82
+official
+cardiologist
+city hospital
+Zolotina
+Elvira
++74965618845
+V.A. Rogozhin st, 141, 360
+personal
+24.09.1990
+Ivanovich
+Peter
+89234514151
+Bolshaya Street, 1
+personal
+04.05.1957
+Serovich
+Nikolay
+89373198160
+Lane Small, 15
+personal
+29.04.1988
+Aboba
+Marina
+89771842514
+Central Avenue, 21
+personal
+18.07.2001
+Sasatin
+Valery
++79612315489
+Masters Lane, 5
+official
+TV repairer
+workshop
+Kudryavtseva
+Angelina
+84969215307
+Fialkova Street, 28
+official
+florist
+Flower shop
+Ozhekin
+Andrey
+89237712535
+Alley of Stars, 4
+personal
+31.10.1994
+Skokova
+Sveta
+86548511243
+Rodnaya Street, 8
+personal
+16.11.1991
+Chvanov
+Nikita
+89378478573
+Aviation 9/2
+personal
+30.09.1977
+Kortana
+Evgeniy
+89346452948
+KRAVCHENKO 11/4
+official
+dentist
+MyDoctor
+Arigina
+Viktoria
+89093434341
+SUSLOVA 34
+personal
+09.09.2009
+Gutyon
+Anton
+89322920485
+KRAVCHENKO 1
+official
+servant
+restourant
+Jofreed
+Daniil
+83957392057
+SAVINOVA 13A
+personal
+31.12.1994
+Vivivina
+Tatyana
+83495038274
+VINOKUROVA 15
+personal
+31.04.2004
+Erdin
+Maksim
+83459294727
+OCTOBER 49/1
+official
+office worker
+Monetochka
+Zbuner
+Oleg
++74927583914
+BOESKOROVA 16/1
+personal
+23.04.1987
+Labutina
+Diana
+89208748294
+SEMENOVA 1
+official
+teacher
+School No. 1337
+Fedun
+Georgiy
+86374927638
+YOUTH 34/2
+personal
+05.01.2004
+Nutredin
+Aleksey
+89776548900
+MORTGAGE 62/2
+personal
+13.03.2002
+Vakhin
+Denis
+89377973899
+REINDEER HERDERS 12/4
+official
+cooker
+restaurant
+Olerov
+Ivan
+85621456246
+SHOLOGONSKAYA 45
+personal
+17.03.2005
+Tacherin
+Boris
+89654275368
+MORTGAGE 60/2
+personal
+26.12.1877
+Koldan
+Alexander
+87429541357
+NEW 15
+personal
+03.11.1996
+Lomina
+Darya
+86247513548
+LESNAYA 1
+official
+worker
+plant "Moskovskiy"
+Deytina
+Liza
+84579586210
+OCTOBER 7
+personal
+27.04.1993
+Zhdabina
+Ekaterina
+86541245963
+MORTGAGE 64/5
+personal
+06.08.1945
+Degtyareva
+Marina
++78654056563
+SOLOMONOVA 3
+official
+beauty bloger
+home
+Jordana
+Elena
+851515365456
+KHARITONOVA 13
+personal
+18.05.1993
+Roleev
+Konstantin
+86547532157
+SHOLOGONSKAYA 1
+personal
+19.09.1998
+Tannov
+Yaroslav
+85421563547
+NEW 9
+personal
+02.12.1999
+Savin
+Artem
+87563455155
+BOESKOROVA 42/4
+official
+servant
+restaurant
