@@ -1,0 +1,22 @@
+﻿3DS
+DS
+Game Boy Advance
+Xbox
+Switch
+Wii
+PlayStation Vita
+PlayStation 5
+Nintendo 64
+Xbox One
+Stadia
+PlayStation
+PlayStation 3
+GameCube
+Dreamcast
+PC
+Xbox 360
+PlayStation 2
+PlayStation 4
+PSP
+Wii U
+Xbox Series X

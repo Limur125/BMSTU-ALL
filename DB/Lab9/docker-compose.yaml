@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  sqlsever:
+    container_name: mssql_container
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: Password_1
+    ports:
+        - 1433:1433
+    networks:
+        - my_persistent_network
+
+  redis-stack:
+      hostname: my_redis
+      container_name: redis_container
+      image: 'redis/redis-stack:latest'
+      ports:
+          - '8001:8001'
+      networks:
+        - my_persistent_network
+
+  redis-stack-server:
+      hostname: my_redis_server
+      container_name: redis_server_container
+      image: 'redis/redis-stack-server:latest'
+      ports:
+          - '6379:6379'
+      networks:
+        - my_persistent_network
+
+
+
+networks:
+  my_persistent_network:
+    driver: bridge

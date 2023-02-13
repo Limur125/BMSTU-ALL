@@ -1,0 +1,25 @@
+(1) Params p = (Params)parametrs;
+(2) int sw = p.WidthStart, ew = p.WidthEnd, sh = p.HeightStart, eh = p.HeightEnd;
+(3) for (int i = sw; i < ew; i++)
+(4)    	for (int j = sh; j < eh; j++)
+    	{
+(5)         Trace t = TraceRay(i - (Cw / 2), -j + (Ch / 2));
+(6)         CastShadow(t);
+(17)	    RenderSmoke(t);
+(7)         lbmp.SetPixel(i, j, t.Color);
+    	}
+
+(8)  private Trace TraceRay(int x, int y)
+     {
+(9)      Vector3 init = new Vector3(x * Vw / Cw, y * Vh / Ch, d);
+(10)     Vector3 zero = new Vector3(0, 0, 0);
+(11)     Ray r = new Ray(init, zero);
+(12)     return Composite.TraceRay(r, light);
+     }
+
+(13) private void CastShadow(Trace trace)
+     {
+(14)     trace.IsShadowed = Composite.CastShadow(trace, light.Position);
+(15)     if (trace.IsShadowed)
+(16)         trace.Color = Color.FromArgb((int)(trace.Color.R * 0.3f), (int)(trace.Color.G * 0.3f), (int)(trace.Color.B * 0.3f));
+     }

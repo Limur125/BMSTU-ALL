@@ -1,0 +1,128 @@
+\chapter{Технологический раздел}
+
+В данном разделе будут приведены средства реализации и листинги кода.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран язык программирования C\# \cite{sharplang}, т.к. его средств достаточно для реализации поставленной задачи.
+
+Структура~ данных ~словарь~ была~ реализована~ с ~помощью ~класса \\Dictionary<string,~int>.
+
+\section{Реализация алгоритмов}
+В листингах \ref{lst:ss}, \ref{lst:bf}, \ref{lst:main} представлены реализации алгоритма поиска подстроки в строке и алгоритма полного перебора для поиска по словарю, а также методы, анализирующие вопрос.
+\captionsetup{justification=raggedright, singlelinecheck=false}
+
+\begin{lstlisting}[label=lst:ss,caption=Реализация алгоритма поиска подстроки в строке]
+public int FindSubstring(string source, string sub)
+{
+	int res = -1;
+	if (source.Length == 0 || sub.Length == 0)
+		return res;
+	for (int i = 0; i < source.Length - sub.Length + 1; i++)
+		for (int j = 0; j < sub.Length; j++)
+			if (sub[j] != source[i + j])
+				break;
+			else if (j == sub.Length - 1)
+			{
+				res = i;
+				break;
+			}
+	return res;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:bf, caption=Реализация алгоритма полного перебора поиска по словарю]
+static Dictionary<string, int> Find(Dictionary<string, int> src, int l, int u)
+{
+	Dictionary<string, int> res = new Dictionary<string, int>();
+	foreach(KeyValuePair<string, int> kv in src)
+		if (kv.Value > l && kv.Value < u)
+			res.Add(kv.Key, kv.Value);
+	return res;
+}
+\end{lstlisting}
+\begin{lstlisting}[label=lst:main, caption=Анализирующие вопрос методы]
+static int IsQuestionValid(string question)
+{
+	SubstringFinder sf = new SubstringFinder();
+	int pos;
+	if ((pos = sf.FindSubstring(question.ToLowerInvariant(), "найди")) != -1) ;
+	else if ((pos = sf.FindSubstring(question.ToLowerInvariant(), "какие")) != -1) ;
+	else if ((pos = sf.FindSubstring(question.ToLowerInvariant(), "выбери")) != -1) ;
+	else if ((pos = sf.FindSubstring(question.ToLowerInvariant(), "покажи")) != -1) ;
+	else return -1;
+	int ppos = pos;
+	if ((pos = sf.FindSubstring(question, "видео")) != -1) { if (ppos > pos) return -1; }
+	else if ((pos = sf.FindSubstring(question, "видосы")) != -1) { if (ppos > pos) return -1; }
+	else return 0;
+	ppos = pos;
+	int[] cat = Category(question);
+	int cpos = cat[0], cc = cat[1];
+	if (cpos == -1 || cpos < ppos)
+	return -1;
+	if ((pos = sf.FindSubstring(question, "популярност")) != -1) { if (ppos > pos || cpos > pos) return -1; }
+	else if ((pos = sf.FindSubstring(question, "просмотр")) != -1) { if (ppos > pos || cpos > pos) return -1; }
+	else if ((pos = sf.FindSubstring(question, "посмотрел")) != -1)
+	{
+		if (ppos > pos || cpos < pos) return -1;
+		ppos = pos;
+		if ((pos = sf.FindSubstring(question, "количество людей")) != -1) { if (ppos > pos || pos < cpos) return -1; }
+		else if ((pos = sf.FindSubstring(question, "количество человек")) != -1) { if (ppos > pos || cpos > pos) return -1; }
+	}
+	else return 0;
+	return cc;
+}
+static int[] Category(string question)
+{
+	SubstringFinder sf = new();
+	int[] res = new int[] { -1, 0 };
+	if ((res[0] = sf.FindSubstring(question, "не очень маленьк")) > 0)
+	res[1] = 2;
+	else if ((res[0] = sf.FindSubstring(question, "очень маленьк")) > 0)
+	res[1] = 1;
+	else if ((res[0] = sf.FindSubstring(question, "немаленьк")) > 0) 
+	res[1] = 6;
+	else if ((res[0] = sf.FindSubstring(question, "маленьк")) > 0) 
+	res[1] = 4;
+	else if ((res[0] = sf.FindSubstring(question, "средн")) > 0)
+	res[1] = 5;
+	else if ((res[0] = sf.FindSubstring(question, "не очень больш")) > 0) 
+	res[1] = 7;
+	else if ((res[0] = sf.FindSubstring(question, "очень больш")) > 0)
+	res[1] = 9;
+	else if ((res[0] = sf.FindSubstring(question, "небольш")) > 0) 
+	res[1] = 3;
+	else if ((res[0] = sf.FindSubstring(question, "невероятно больш")) > 0)
+	res[1] = 10;
+	else if ((res[0] = sf.FindSubstring(question, "больш")) > 0) 
+	res[1] = 8;
+	return res;
+}
+\end{lstlisting}
+
+\section{Тестирование}
+
+В таблице \ref{tbl:test} приведены тесты для метода, реализующего алгоритм поиска строки в подстроке. 
+Тесты пройдены успешно.
+
+\begin{table}[H]
+	\begin{center}
+		
+		\caption{\label{tbl:test} Тестирование методов}
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+			Строковый запрос& Искомая строка &Ожидаемый& Полученный  \\
+			на поиск && результат &результат\\\hline
+			Популярные видео & видео & 11 & 11\\\hline
+			Найди видео с & &  &  \\
+			немаленьким числом &&&\\
+			просмотров.& просмотр & 33 & 33 \\\hline
+			Популярные видео & просмотр & -1 & -1\\\hline
+			
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+
+Были реализованы алгоритм поиска подстроки в строке и алгоритм полного перебора поиска по словарю, а также методы, анализирующие вопрос.

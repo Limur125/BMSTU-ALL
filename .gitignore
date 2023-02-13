@@ -1,6 +1,15 @@
 *.exe
 *.pyc
-.vs
 .vscode
 *build*
 x64
+*\.vs
+*\obj
+*\bin
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.gz
+*.toc

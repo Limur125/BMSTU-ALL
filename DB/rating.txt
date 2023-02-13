@@ -1,0 +1,7 @@
+RP	Rating Pending
+EC	Early Childhood
+E	Everyone
+E 10+	Everyone 10+
+T	Teen
+M	Mature
+A	Adult

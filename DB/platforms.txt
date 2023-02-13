@@ -1,0 +1,22 @@
+Xbox 360	Microsoft	2005	3200	512
+GameCube	Nintendo	2001	485	43
+Wii U	Nintendo	2012	1240	2048
+3DS	Nintendo	2011	268	128
+Switch	Nintendo	2017	1000	4096
+Xbox	Microsoft	2002	733	64
+Nintendo 64	Nintendo	1997	93	1
+Xbox One	Microsoft	2014	1750	8000
+PlayStation	Sony Interactive Entertainment	1995	33	2
+PlayStation 4	Sony Interactive Entertainment	2013	1600	8000
+PSP	Sony Interactive Entertainment	2005	333	32
+PC	Intel	2009	3	8000
+PlayStation 3	Sony Interactive Entertainment	2007	3200	256
+Wii	Nintendo	2006	729	88
+Game Boy Advance	Nintendo	2001	16	1
+DS	Nintendo	2005	67	4
+Stadia	Google	2019	10000	16000
+Dreamcast	Sega	1998	200	16
+Xbox Series X	Microsoft	2020	3800	16000
+PlayStation Vita	Sony Interactive Entertainment	2012	2000	512
+PlayStation 2	Sony Interactive Entertainment	2012	294	32
+PlayStation 5	Sony Interactive Entertainment	2020	3500	16000
