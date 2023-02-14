@@ -1,0 +1,150 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут приведены требования к программному обеспечению, средства реализации и листинги кода.
+
+\section{Требования к программному обеспечению}
+
+К программе предъявляется ряд требований.
+
+На вход подаётся массив сравнимых элементов (целые числа). 
+
+На выходе — тот же массив, но в отсортированном виде.
+
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран язык программирования C\# \cite{sharplang}. 
+
+Язык C\# является полностью объектно-ориентированным. 
+Все необходимые библиотеки для реализации поставленной задачи являются стандартными.
+
+Время работы алгоритмов было замерено с помощью функции clock() \cite{cpplangtime}.
+
+\section{Сведения о модулях программы}
+Программа состоит из пяти модулей.
+\begin{enumerate}
+	\item Programm.cs --- главный файл программы, в котором располагается код меню;
+	\item BaseSort.cs --- файл с базовым классом алгоритмов.
+	\item BubbleSort.cs, QuickSort.cs, CombSort.cs --- файлы с кодами алгоритмов
+\end{enumerate}
+
+
+\section{Реализация алгоритмов}
+В листингах \ref{lst:quick}, \ref{lst:bubble}, \ref{lst:comb} представлены реализации алгоритмов сортировок (быстрой, пузырьком и расческой).
+
+\begin{lstlisting}[label=lst:quick,caption=Класс быстрой сортировки]
+internal class QuickSort<Type> : BaseSort<Type>
+{
+	public QuickSort(Comparator comp) : base(comp) { }
+	public override Type[] Sort(Type[] array) 
+	{
+		return Sort(array, 0, array.Length - 1);
+	}
+	
+	private Type[] Sort(Type[] array, int left, int right)
+	{
+		int i = left;
+		int j = right;
+		Type pivot = array[left];
+		while (i <= j)
+		{
+			while (comp(array[i], pivot) < 0)
+			i++;
+			while (comp(array[j], pivot) > 0)
+			j--;
+			if (i <= j)
+			{
+				(array[j], array[i]) = (array[i], array[j]);
+				i++;
+				j--;
+			}
+		}
+		
+		if (left < j)
+		Sort(array, left, j);
+		if (i < right)
+		Sort(array, i, right);
+		return array;
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:bubble,caption= Класс сортировки пузырьком]
+internal class BubbleSort<Type> : BaseSort<Type>
+{
+	public BubbleSort(Comparator comp) : base(comp) { }
+	public override Type[] Sort(Type[] array)
+	{
+		int n = array.Length;
+		for (int i = 0; i < n - 1; i++)
+		for (int j = 0; j < n - i - 1; j++)
+		if (comp(array[j], array[j + 1]) > 0)
+		(array[j + 1], array[j]) = (array[j], array[j + 1]);
+		return array;
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:comb,caption=Класс сортировки расческой]
+internal class CombSort<Type> : BaseSort<Type>
+{
+	readonly int coef = 127;
+	public CombSort(Comparator comp) : base(comp) { }
+	
+	public override Type[] Sort(Type[] array)
+	{
+		int gap = array.Length;
+		bool swaps = true;
+		
+		while (gap > 1 || swaps)
+		{
+			gap = gap * 100 / coef;
+			
+			if (gap < 1)
+			gap = 1;
+			
+			swaps = false;
+			
+			for (int i = 0; i + gap < array.Length; i++)
+			{
+				int igap = i + gap;
+				
+				if (comp(array[i], array[igap]) > 0)
+				{
+					(array[igap], array[i]) = (array[i], array[igap]);
+					swaps = true;
+				}
+			}
+		}
+		return array;
+	}
+}
+\end{lstlisting}
+
+\section{Модульные тесты}
+
+В таблице \ref{tbl:functional_test} приведены тесты для методов, реализующих алгоритмы сортировки. Тесты пройдены успешно.
+
+\captionsetup{justification=raggedright, singlelinecheck=false}
+
+\begin{table}[H]
+		\caption{\label{tbl:functional_test} Модульные тесты}
+	\begin{center}
+			\begin{tabular}{|c|c|c|}
+			\hline
+			Входной массив & Ожидаемый результат & Результат \\ 
+			\hline
+			$[1,2,3,4]$ & $[1,2,3,4]$  & $[1,2,3,4]$\\
+			$[5,4,3,2,1]$  & $[1,2,3,4,5]$ & $[1,2,3,4,5]$\\
+			$[3,2,-5,0,1]$  & $[-5,0,1,2,3]$  & $[-5,0,1,2,3]$\\
+			$[4]$  & $[4]$  & $[4]$\\
+			$[]$  & $[]$  & $[]$\\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+
+\section*{Вывод}
+
+Были реализованы все три алгоритма сортировок (быстрой, пузырьком и расческой). Выполнено модульное тестирование реализаций трех алгоритмов сортировки.

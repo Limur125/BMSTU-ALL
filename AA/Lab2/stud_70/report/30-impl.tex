@@ -1,0 +1,280 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут приведены требования к программному обеспечению, средства реализации и листинги кода.
+
+\section{Требования к программному обеспечению}
+
+На вход реализация алгоритма должна принимать две матрицы. 
+
+На выход реализация алгоритма должна выдавать матрицу, которая является результатом умножения двух входных матриц.
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран язык программирования C\# \cite{sharplang}. 
+
+Язык C\# является полностью объектно-ориентированным. 
+Все необходимые библиотеки для реализации поставленной задачи являются стандартными.
+
+Время работы алгоритмов было замерено с помощью функции clock().
+
+\section{Сведения о модулях программы}
+Программа состоит из пяти модулей.
+\begin{enumerate}
+	\item Programm.cs - главный файл программы, в котором располагается код меню;
+	\item BaseAlgo.cs - файл с базовым классом алгоритмов.
+	\item Classic.cs, Vinograd.cs, OptimizedVinograd.cs - файлы с кодами алгоритмов
+\end{enumerate}
+
+
+\section{Реализация алгоритмов}
+В листингах \ref{lst:classic}, \ref{lst:vino}, \ref{lst:optvino} представлены реализации алгоритмов умножения матриц (классический, Винограда и оптимизированный по Винограду).
+
+\begin{lstlisting}[label=lst:classic,caption=Класс с реализацией классического алгоритма]
+internal class Classic : BaseAlgo
+{
+	public override int[][] Multiply(int[][] A, int[][] B)
+	{
+		int Ar = A.Length;
+		int Br = B.Length;
+		
+		if (Ar == 0 || Br == 0)
+		return null;
+		
+		int Ac = A[0].Length;
+		int Bc = B[0].Length;
+		
+		if (Ac != Bc)
+		return null;
+		
+		int[][] C = new int[Ar][];
+		for (int i = 0; i < Ar; i++)
+		C[i] = new int[Bc];
+		
+		for (int i = 0; i < Ar; i++)
+		for (int j = 0; j < Bc; j++)
+		for (int k = 0; k < Ac; k++)
+		C[i][j] += A[i][k] * B[k][j];
+		
+		return C;
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:vino,caption= Класс с реализацией алгоритма Винограда]
+internal class Vinograd : BaseAlgo
+{
+	public override int[][] Multiply(int[][] A, int[][] B)
+	{
+		int Ar = A.Length;
+		int Br = B.Length;
+		
+		if (Ar == 0 || Br == 0)
+		return null;
+		
+		int Ac = A[0].Length;
+		int Bc = B[0].Length;
+		
+		if (Ac != Br)
+		return null;
+		
+		int[] mulH = new int[Ar];
+		int[] mulV = new int[Bc];
+		
+		int[][] C = new int[Ar][];
+		for (int i = 0; i < Ar; i++)
+		C[i] = new int[Bc];
+		
+		for (int i = 0; i < Ar; i++)
+		for (int j = 0; j < Ac / 2; j++)
+		mulH[i] = mulH[i] + A[i][j * 2] * A[i][j * 2 + 1];
+		
+		for (int i = 0; i < Bc; i++)
+		for (int j = 0; j < Br / 2; j++)
+		mulV[i] = mulV[i] + B[j * 2][i] * B[j * 2 + 1][i];
+		
+		for (int i = 0; i < Ar; i++)
+		for (int j = 0; j < Bc; j++)
+		{
+			C[i][j] = -mulH[i] - mulV[j];
+			for (int k = 0; k < Ac / 2; k++)
+			C[i][j] = C[i][j] + (A[i][2 * k + 1] + B[2 * k][j]) * (A[i][2 * k] + B[2 * k + 1][j]);
+		}
+		
+		if (Ac % 2 == 1)
+		for (int i = 0; i < Ar; i++)
+		for (int j = 0; j < Bc; j++)
+		C[i][j] = C[i][j] + A[i][Ac - 1] * B[Ac - 1][j];
+		
+		return C;
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:optvino,caption=Класс с реализацией оптимизированного алгоритма Винограда]
+internal class OptimizedVinograd : BaseAlgo
+{
+    public override int[][] Multiply(int[][] A, int[][] B)
+	{
+		int Ar = A.Length;
+		int Br = B.Length;
+		
+		if (Ar == 0 || Br == 0)
+		return null;
+		
+		int Ac = A[0].Length;
+		int Bc = B[0].Length;
+		
+		if (Ac != Br)
+		return null;
+		
+		int[] mulH = new int[Ar];
+		int[] mulV = new int[Bc];
+		
+		int[][] C = new int[Ar][];
+		for (int i = 0; i < Ar; i++)
+		C[i] = new int[Bc];
+		
+		int Ac2 = Ac >> 1;
+		for (int i = 0; i < Ar; i++)
+		for (int j = 0; j < Ac2; j++)
+		{
+			int j2 = j << 1;
+			mulH[i] += A[i][j2] * A[i][j2 + 1];
+		}
+		
+		for (int i = 0; i < Bc; i++)
+		for (int j = 0; j < Ac2; j++)
+		{
+			int j2 = j << 1;
+			mulV[i] += B[j2][i] * B[j2 + 1][i];
+		}
+		
+		for (int i = 0; i < Ar; i++)
+		for (int j = 0; j < Bc; j++)
+		{
+			int buf = -mulH[i] - mulV[j];
+			for (int k = 0; k < Ac2; k++)
+			{
+				int k2 = k << 1;
+				int k21 = k2 + 1;
+				buf += (A[i][k21] + B[k2][j]) * (A[i][k2] + B[k21][j]);
+			}
+			C[i][j] = buf;
+		}
+		
+		
+		if (Ac % 2 == 1)
+		for (int i = 0; i < Ar; i++)
+		for (int j = 0; j < Bc; j++)
+		{
+			int Ac1 = Ac - 1;
+			C[i][j] += A[i][Ac1] * B[Ac1][j];
+		}
+		
+		return C;
+	}
+}
+\end{lstlisting}
+
+\section{Модульные тесты}
+
+В таблице~\ref{tabular:test_rec} приведены тесты для методов, реализующих классический алгоритм умножения матриц, алгоритм Винограда и оптимизированный алгоритм Винограда. Тесты пройдены успешно.
+
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\begin{table}[H]
+	\caption{\label{tabular:test_rec} Тестирование методов}
+	\begin{center}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Матрица 1 & Матрица 2 &Ожидаемый результат \\ 
+			\hline
+
+			$\begin{pmatrix}
+				1 & 1 & 1\\
+				5 & 5 & 5\\
+				2 & 2 & 2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 \\
+				1 \\
+				1 
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				3 \\
+				15 \\
+				6
+			\end{pmatrix}$ \\
+			\hline
+
+			$\begin{pmatrix}
+				1 & 1 & 1
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 \\
+				1 \\
+				1
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 & 1 & 1\\
+				1 & 1 & 1 \\
+				1 & 1 & 1
+			\end{pmatrix}$ \\
+			\hline
+
+			$\begin{pmatrix}
+				1 & 1 \\
+				1 & 1
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 & 1\\
+				1 & 1
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				2 & 2\\
+				2 & 2
+			\end{pmatrix}$ \\
+			\hline
+
+			$\begin{pmatrix}
+				2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				4
+			\end{pmatrix}$ \\
+			\hline
+
+			$\begin{pmatrix}
+				1 & -2 & 3\\
+				1 & 2 & 3\\
+				1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				-1 & 2 & 3\\
+				1 & 2 & 3\\
+				1 & 2 & 3
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				0 & 4 & 6\\
+				4 & 12 & 18\\
+				4 & 12 & 18
+			\end{pmatrix}$\\
+			\hline
+
+			$\begin{pmatrix}
+				1 & 2
+			\end{pmatrix}$ &
+			$\begin{pmatrix}
+				1 & 2
+			\end{pmatrix}$ &
+			Неверный размер\\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+\end{table}
+
+\section*{Вывод}
+В данном разделе были реализованы все три алгоритма умножения матриц, а именно: классический алгоритм, алгоритм Винограда и оптимизированный алгоритм Винограда.

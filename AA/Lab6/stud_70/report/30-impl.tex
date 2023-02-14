@@ -1,0 +1,225 @@
+\chapter{Технологическая часть}
+
+В данном разделе будут приведены требования к программному обеспечению, средства реализации и листинги кода.
+
+\section{Требования к программе}
+
+Программа на вход получает матрицу смежности графа.
+
+Выход программы: суммарная стоимость этого маршрута --- целое число и минимальный по стоимости маршрут --- последовательность целых чисел.
+
+Алгоритм полного перебора должен возвращать кратчайший путь.
+
+Программа должна производить параметризацию реализации метода на основе муравьиного алгоритма.
+
+Программа должна замерять время выполнения реализаций метода полного перебора и метода на основе муравьиного алгоритма
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы был выбран язык программирования C\# \cite{sharplang}, т.к. его средств достаточно для реализации поставленной задачи.
+
+Время работы алгоритмов было замерено с помощью свойства \\TotalProcessorTime класса Process, которое возвращает объект TimeSpan, указывающий количество времени, потраченного процессом на загрузку ЦП \cite{cpplangtime}.
+
+\section{Сведения о модулях программы}
+Программа состоит из следующих модулей.
+\begin{enumerate}
+	\item Programm.cs --- главный файл программы, в котором располагается код меню.
+	\item AntAlgorithm.cs --- файл с классом, реализующим муравьиный алгоритм.
+	\item BruteForce.cs  --- файлы с классом, реализующим алгоритм полного перебора.
+	\item Map.cs, Path.cs --- файлы классами маршрута и графа соответственно.
+\end{enumerate}
+
+
+\section{Реализация алгоритмов}
+В листингах \ref{lst:ant}, \ref{lst:bf} представлены реализации муравьиного алгоритма и алгоритма полного перебора.
+\captionsetup{justification=raggedright, singlelinecheck=false}
+
+\begin{lstlisting}[label=lst:ant,caption=Реализация муравьиного алгоритма]
+static class AntAlgorithm
+{
+	public static Path GetRoute(Map map, int maxTime, double alpha, double beta, double Q, double pho)
+	{
+		Random r = new Random();
+		
+		Path shortest = new Path(null, map, int.MaxValue);
+		
+		int count = map.N;
+		double[,] pher = InitPheromone(0.1, count);
+		
+		for (int time = 0; time < maxTime; time++)
+		{
+			List<Ant> ants = InitAnts(map);
+			double[,] deltaPher = InitPheromone(0, count);
+			for (int i = 0; i < count - 1; i++)
+				foreach (Ant ant in ants)
+				{
+					int curTown = ant.LastVisited();
+					
+					double sum = 0;
+					for (int town = 0; town < count; town++)
+						if (!ant.IsVisited(town))
+						{
+							double tau = pher[curTown, town];
+							double eta = 1.0 / map[curTown, town];
+							sum += Math.Pow(tau, alpha) * Math.Pow(eta, beta);
+						}
+		
+					double check = r.NextDouble();
+					int newTown = 0;
+					for (; check > 0; newTown++)
+						if (!ant.IsVisited(newTown))
+						{
+							double tau = pher[curTown, newTown];
+							double eta = 1.0 / map[curTown, newTown];
+							double chance = Math.Pow(tau, alpha) * Math.Pow(eta, beta) / sum;
+							check -= chance;
+						}
+					newTown--;
+					ant.VisitTown(newTown);
+					deltaPher[curTown, newTown] += Q / map[curTown, newTown];
+					deltaPher[newTown, curTown] += Q / map[newTown, curTown];
+				}
+			foreach (Ant ant in ants)
+			{
+				if (ant.GetDistance() < shortest.N)
+					shortest = ant.GetPath();
+			}
+			Ant elite = new Ant(map, shortest.Way[0]);
+			for (int i = 1; i < count; i++)
+			{
+				int newTown = shortest.Way[i];
+				int curTown = elite.LastVisited();
+				elite.VisitTown(newTown);
+				deltaPher[curTown, newTown] += Q / map[curTown, newTown];
+				deltaPher[newTown, curTown] += Q / map[newTown, curTown];
+			}
+			for (int k = 0; k < count; k++)
+				for (int t = 0; t < count; t++)
+				{
+					pher[k, t] = (1 - pho) * pher[k, t] + deltaPher[k, t];
+					pher[k, t] = pher[k, t] < 0.1 ? 0.1 : pher[k, t];
+				}
+		}
+		return shortest;
+	}
+	
+	private static List<Ant> InitAnts(Map map)
+	{
+		List<Ant> ants = new List<Ant>();
+		for (int i = 0; i < map.N; i++)
+			ants.Add(new Ant(map, i));
+		return ants;
+	}
+	
+	private static double[,] InitPheromone(double num, int size)
+	{
+		double[,] phen = new double[size, size];
+		for (int i = 0; i < size; i++)
+			for (int j = 0; j < size; j++)
+				phen[i, j] = num;
+		return phen;
+	}
+	
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=lst:bf, caption=Реализация алгоритма полного перебора]
+	static class BruteForce
+	{
+		public static Path GetRoute(Map map)
+		{
+			Path shortest = new Path(null, map, int.MaxValue);
+			List<int> a = new List<int>();
+			for (int i = 0; i < map.N; i++)
+				a.Add(i);
+			foreach (List<int> cur in GetAllRoutes(a, new List<int>()))
+			{
+				Path check = new Path(cur, map, -1);
+				check.GetDistance();
+				if (shortest.N > check.N)
+					shortest = check;
+			}
+			return shortest;
+		}
+		
+		private static IEnumerable<List<int>> GetAllRoutes(List<int> arg, List<int> awithout)
+		{
+			if (arg.Count == 1)
+			{
+				var result = new List<List<int>> { new List<int>() };
+				result[0].Add(arg[0]);
+				return result;
+			}
+			else
+			{
+				var result = new List<List<int>>();
+				
+				foreach (var first in arg)
+				{
+					var others0 = new List<int>(arg.Except(new int[1] { first }));
+					awithout.Add(first);
+					var others = new List<int>(others0.Except(awithout));
+					
+					var combinations = GetAllRoutes(others, awithout);
+					awithout.Remove(first);
+					
+					foreach (var tail in combinations)
+					{
+						tail.Insert(0, first);
+						result.Add(tail);
+					}
+				}
+				return result;
+			}
+		}
+	}
+\end{lstlisting}
+
+\section{Тестирование}
+
+В таблице \ref{tbl:test} приведены тесты для методов, реализующих алгоритм полного перебора и муравьиный алгоритм. 
+Тесты пройдены успешно.
+При тестировании муравьиного алгоритма тесты прошли успешно, так как матрицы смежности маленькие, и поэтому муравьиный алгоритм возвращает такие же результаты, как и алгоритм полного перебора.
+
+\begin{table}[H]
+	\begin{center}
+		
+		\caption{\label{tbl:test} Тестирование методов}
+		\begin{tabular}{|c@{\hspace{5mm}}|c@{\hspace{5mm}}|c@{\hspace{5mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}|c@{\hspace{7mm}}}
+			\hline
+			Матрица смежности & Ожидаемый результат & Действительный результат \\ \hline
+
+			$\begin{pmatrix}
+				0 &  1 &  10 &  7\\
+				1 &  0 &  1 &  2\\
+				10 &  1 &  0 &  1\\
+				7 &  2 &  1 &  0
+			\end{pmatrix}$ &
+			3 -- 0 1 2 3&
+			3 -- 0 1 2 3\\
+
+			\hline
+			$\begin{pmatrix}
+				0 &  3 &  5 &  7\\
+				7 &  0 &  1 &  2\\
+				5 &  1 &  0 &  1\\
+				7 &  2 &  1 &  0
+			\end{pmatrix}$ &
+			8 -- 0 2 1 3&
+			8 -- 0 2 1 3\\
+			\hline
+			$\begin{pmatrix}
+				0 &  3 &  5\\
+				3 &  0 &  1\\
+				5 &  1 &  0
+			\end{pmatrix}$ &
+			4 -- 0 1 2&
+			4 -- 0 1 2\\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+
+Были реализованы муравьиный алгоритм и алгоритм полного перебора.
