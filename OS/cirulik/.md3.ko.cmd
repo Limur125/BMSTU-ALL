@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md3.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md3.ko /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md3.o /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md3.mod.o;  true

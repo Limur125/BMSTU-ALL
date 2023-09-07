@@ -1,0 +1,12 @@
+domains
+list = integer*
+
+predicates
+append(list, list, list) .
+
+clauses
+append([], L, L) :- !.
+append([H|T], L, [H|ResT]) :- append(T, L, ResT).
+
+goal
+append([1, 2, 5], [3, 4], Res).

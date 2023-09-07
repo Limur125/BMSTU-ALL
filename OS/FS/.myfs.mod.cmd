@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/myfs.mod := printf '%s\n'   myfs.o | awk '!x[$$0]++ { print("/media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/"$$0) }' > /media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/myfs.mod

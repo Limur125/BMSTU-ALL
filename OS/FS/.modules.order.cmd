@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/modules.order := {   echo /media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/myfs.ko; :; } | awk '!x[$$0]++' - > /media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/modules.order

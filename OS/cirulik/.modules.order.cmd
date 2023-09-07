@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/modules.order := {   echo /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md1.ko;   echo /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.ko;   echo /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md3.ko; :; } | awk '!x[$$0]++' - > /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/modules.order

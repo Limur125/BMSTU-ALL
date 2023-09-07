@@ -1,0 +1,59 @@
+﻿@using Blazorise.Extensions
+@using BlazorApp.Data
+
+<Modal @ref="@modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Изменить материал</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Наименование</FieldLabel>
+                <TextEdit  @bind-Text="@material.Name"></TextEdit>
+            </Field>
+            <Field>
+                <FieldLabel>Код</FieldLabel>
+                <TextEdit MaxLength="10" @bind-Text="@material.Serial"></TextEdit>
+            </Field>
+            <Field>
+                <FieldLabel>Количество</FieldLabel>
+                <NumericEdit TValue="uint" Min="1" @bind-Value="@material.Count"></NumericEdit>
+            </Field>
+            <Field>
+                <FieldLabel>Комментарий</FieldLabel>
+                <MemoEdit Rows="5" @bind-Text="@material.Comment"></MemoEdit>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Отменить</Button>
+            <Button Color="Color.Primary" Clicked="SaveRequest">Сохранить</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    [Parameter]
+    public EventCallback<Material> OnSubmit { get; set; }
+    private Modal modalRef;
+    private Material material = new();
+    private Request request;
+
+    public async Task Show(Request r, Material m)
+    {
+        request = r;
+        material = (Material) m.Clone();
+        await modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+
+    private async void SaveRequest()
+    {
+        await OnSubmit.InvokeAsync(material);
+        await modalRef.Hide();
+    }
+}

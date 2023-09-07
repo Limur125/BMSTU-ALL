@@ -1,0 +1,68 @@
+1. Если md2 вызвать функцию local
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.c: In function ‘md_init’:
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.c:18:59: error: implicit declaration of function ‘md1_local’ [-Werror=implicit-function-declaration]
+   18 |         printk("+ string returned md1_local() is : %s\n", md1_local()); //2
+      |                                                           ^~~~~~~~~
+./include/linux/printk.h:436:33: note: in definition of macro ‘printk_index_wrap’
+  436 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
+      |                                 ^~~~~~~~~~~
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.c:18:9: note: in expansion of macro ‘printk’
+   18 |         printk("+ string returned md1_local() is : %s\n", md1_local()); //2
+      |         ^~~~~~
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.c:18:16: warning: format ‘%s’ expects argument of type ‘char *’, but argument 2 has type ‘int’ [-Wformat=]
+   18 |         printk("+ string returned md1_local() is : %s\n", md1_local()); //2
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ~~~~~~~~~~~
+      |                                                           |
+      |                                                           int
+./include/linux/printk.h:436:25: note: in definition of macro ‘printk_index_wrap’
+  436 |                 _p_func(_fmt, ##__VA_ARGS__);                           \
+      |                         ^~~~
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.c:18:9: note: in expansion of macro ‘printk’
+   18 |         printk("+ string returned md1_local() is : %s\n", md1_local()); //2
+      |         ^~~~~~
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.c:18:53: note: format string is defined here
+   18 |         printk("+ string returned md1_local() is : %s\n", md1_local()); //2
+      |                                                    ~^
+      |                                                     |
+      |                                                     char *
+      |                                                    %d
+cc1: some warnings being treated as errors
+
+Возникает ошибка компляции
+
+
+2.Если в md.h объявить функцию local как extern
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md1.c:16:14: error: static declaration of ‘md1_local’ follows non-static declaration
+   16 | static char *md1_local(void)
+      |              ^~~~~~~~~
+In file included from /media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md1.c:4:
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md.h:10:14: note: previous declaration of ‘md1_local’ with type ‘char *(void)’
+   10 | extern char *md1_local(void);
+      |              ^~~~~~~~~
+/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md1.c:16:14: warning: ‘md1_local’ defined but not used [-Wunused-function]
+   16 | static char *md1_local(void)
+      |              ^~~~~~~~~
+
+Возникает ошибка компляции
+
+3. Если в md2 вызвать функцию noexport
+
+ERROR: modpost: "md1_noexport" [/media/alexey/5CF228A5F228857C/zolot/OS/cirulik/md2.ko] undefined!
+
+Возникает ошибка линковщика
+
+4. Если попытаться md2 загрузить раньше чем md1 
+
+insmod: ERROR: could not insert module md2.ko: Unknown symbol in module
+
+syslog:
+Apr 24 14:22:35 alexey-IdeaPad-Gaming-3-15ARH05 kernel: [ 4164.289216] md2: Unknown symbol md1_data (err -2)
+Apr 24 14:22:35 alexey-IdeaPad-Gaming-3-15ARH05 kernel: [ 4164.289239] md2: Unknown symbol md1_proc (err -2)
+
+5. Если попытаться загрузить md3 то модуль не будет загружен, так как код возврата из md_init -1
+
+insmod: ERROR: could not insert module md3.ko: Operation not permitted
+
+syslog:
+Apr 24 14:23:31 alexey-IdeaPad-Gaming-3-15ARH05 kernel: [ 4219.882678] + module md3 start!
+

@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/OS/ProcP2/Fortune/Module.symvers := sed 's/ko$$/o/' /media/alexey/5CF228A5F228857C/zolot/OS/ProcP2/Fortune/modules.order | scripts/mod/modpost -m -a  -o /media/alexey/5CF228A5F228857C/zolot/OS/ProcP2/Fortune/Module.symvers -e -i Module.symvers   -T -

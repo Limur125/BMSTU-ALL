@@ -1,0 +1,44 @@
+﻿@using Blazorise.Extensions
+@using BlazorApp.Data
+
+<Modal @ref="@modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Удалить материал</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Вы точно хотите удалить материал?</FieldLabel>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Нет</Button>
+            <Button Color="Color.Primary" Clicked="SaveRequest">Да</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    [Parameter]
+    public EventCallback<Material> OnSubmit { get; set; }
+    private Modal modalRef;
+    private Material material;
+
+    public async Task Show(Material m)
+    {
+        material = m;
+        await modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+
+    private async void SaveRequest()
+    {
+        await OnSubmit.InvokeAsync(material);
+        await modalRef.Hide();
+    }
+}

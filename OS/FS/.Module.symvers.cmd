@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/Module.symvers := sed 's/ko$$/o/' /media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/modules.order | scripts/mod/modpost -m -a  -o /media/alexey/5CF228A5F228857C/zolot/bmstuArchive/OS/FS/Module.symvers -e -i Module.symvers   -T -

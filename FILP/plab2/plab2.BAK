@@ -1,0 +1,70 @@
+domains
+
+city, street = string.
+house, flat = integer.
+struct_address = address(city, street, house, flat).
+surname = string.
+phone = integer.
+model, color = string.
+price, year, serial = integer.
+bank = string.
+sum, account = integer.
+size = integer.
+
+ownership = building(price, struct_address);
+area(price, size);
+water_transport(price, color);
+car(price, model, color).
+
+predicates
+
+phone_record(surname, phone, struct_address).
+car(surname, model, color, price, serial).
+depositor(surname, bank, account, sum).
+own(surname, ownership).
+findOwnershipsNamePriceBySurname(surname, string, price).
+sumOwnershipsPriceHelp(surname, string, price).
+sumOwnershipsPrice(surname, price).
+
+clauses
+
+phone_record(rich, 7777772, address(london, green, 1, 10)).
+phone_record(rich, 7777771, address(london, green, 1, 10)).
+phone_record(rich, 1111111, address(moscow, zelenaya, 2, 20)).
+phone_record(middle, 9999999, address(moscow, ivanovskaya, 3, 2)).
+phone_record(poor, 3333331, address(karaganda, pit, 23, 5)).
+phone_record(poor, 3333332, address(perm, pit, 36, 7)).
+phone_record(poor, 3333333, address(kop,leet, 2, 53)).
+
+car(rich, coolmodel, red, 1000000, 123456).
+car(rich, coolestmodel, green, 5000000, 837495).
+car(rich, coolestmodel, blue, 5000000, 836472).
+car(middle, awesommodel, red, 1000000, 047163).
+
+depositor(rich, gosbank, 10, 10000000).
+depositor(rich, mosbank, 15, 9000000).
+depositor(middle, mosbank, 17, 20000).
+depositor(middle, newbank, 345, 0).
+
+own(rich, building(100, address(kop, leet, 2, 53))).
+own(rich, area(10, 500)).
+own(rich, water_transport(1, green)).
+own(rich, car(5, model1, red)).
+
+own(middle, car(3, model2, red)).
+own(middle, building(90, address(moscow, leninskaya, 2, 53))).
+
+findOwnershipsNamePriceBySurname(S, building, P) :- own(S, building(P, _)).
+findOwnershipsNamePriceBySurname(S, area, P) :- own(S, area(P, _)).
+findOwnershipsNamePriceBySurname(S, water_transport, P) :- own(S, water_transport(P, _)).
+findOwnershipsNamePriceBySurname(S, car, P) :- own(S, car(P, _, _)).
+
+sumOwnershipsPriceHelp(S, building, P) :- own(S, building(P, _)).
+sumOwnershipsPriceHelp(S, area, P) :- own(S, area(P, _)).
+sumOwnershipsPriceHelp(S, water_transport, P) :- own(S, water_transport(P, _)).
+sumOwnershipsPriceHelp(S, car, P) :- own(S, car(P, _, _)).
+
+sumOwnershipsPrice(S, P) :- sumCostInner(S, building, P1), sumCostInner(S, area, P2), sumCostInner(S, water_transport, P3), sumCostInner(S, car, P4), P = P1 + P2 + P3 + P4.
+
+goal
+findOwnershipsNamePriceBySurname(rich, Ownnership, _).

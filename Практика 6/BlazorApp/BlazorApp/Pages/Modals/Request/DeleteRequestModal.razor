@@ -1,0 +1,44 @@
+﻿@using Blazorise.Extensions
+@using BlazorApp.Data
+
+<Modal @ref="@modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Удалить заявку</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Вы точно хотите удалить заявку?</FieldLabel>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Нет</Button>
+            <Button Color="Color.Primary" Clicked="@SaveRequest">Да</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    [Parameter]
+    public EventCallback<Request> OnSubmit { get; set; }
+    private Modal modalRef;
+    private Request request;
+
+    public async Task Show(Request r)
+    {
+        request = r;
+        await modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+
+    private async Task SaveRequest()
+    {
+        await OnSubmit.InvokeAsync(request);
+        await modalRef.Hide();
+    }
+}

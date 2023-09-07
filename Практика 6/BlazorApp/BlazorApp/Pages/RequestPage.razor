@@ -1,0 +1,141 @@
+﻿@page "/requestpage/{StrId}"
+
+@using BlazorApp.Data
+@using Blazorise.DataGrid
+@using BlazorApp.Pages.Modals.Material
+
+@inject IRequestService requestService
+@inject IMaterialService materialService
+@inject NavigationManager navManager
+
+@if (request == null)
+{
+	<p><em>Заявка не найдена</em></p>
+}
+else
+{
+    <PageTitle>Заявка №@request.FullNumber</PageTitle>
+    <center><h1>Заявка №@request.FullNumber</h1></center>
+        <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+        <Items>
+            <Tab Name="request">Заявка</Tab>
+            <Tab Name="materials">Материалы</Tab>
+        </Items>
+        <Content>
+            <TabPanel Name="request">
+                    <Table Bordered>
+                        <TableBody>
+                            <TableRow>
+                                <TableRowHeader>№ заявки:</TableRowHeader>
+                                <TableRowCell>@request.FullNumber</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Автор заявки:</TableRowHeader>
+                                <TableRowCell>@request.Author</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Подразделение автора:</TableRowHeader>
+                                <TableRowCell>@request.Department</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                    <TableRowHeader>Дата создания:</TableRowHeader>
+                                <TableRowCell>@request.Created</TableRowCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableRowHeader>Статус:</TableRowHeader>
+                                <TableRowCell>@request.TextStatus</TableRowCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+            </TabPanel>
+            <TabPanel Name="materials">
+                <DataGrid TItem="Material"
+                    Data="@request.Materials"
+                    @bind-SelectedRow="@selected"
+                    Editable
+                    Responsive
+                    Filterable
+                    FilterMode="DataGridFilterMode.Menu"
+                    ShowPager
+                    CommandMode="DataGridCommandMode.ButtonRow">
+                <DataGridColumns>
+                    <DataGridColumn Field="@nameof(Material.Name)" Caption="Наименование" Editable/>
+                    <DataGridColumn Field="@nameof(Material.Serial)" Caption="Код" Editable />
+                    <DataGridColumn Field="@nameof(Material.Count)" Caption="Количество" Editable />
+                    <DataGridColumn Field="@nameof(Material.Comment)" Caption="Комментарий" Editable/>
+                </DataGridColumns>
+                <ButtonRowTemplate>
+                    <Button Color="Color.Success" Disabled="(request.State == RequestState.APPROVED)" Clicked="ShowCreate">Добавить</Button>
+                    <Button Color="Color.Primary" Disabled="(selected is null || request.State == RequestState.APPROVED)" Clicked="ShowEdit">Изменить</Button>
+                    <Button Color="Color.Danger" Disabled="(selected is null || request.State == RequestState.APPROVED)" Clicked="ShowDelete">Удалить</Button>
+                </ButtonRowTemplate>
+                
+            </DataGrid>
+            </TabPanel>
+        </Content>
+    </Tabs>   
+
+    <AddMaterialModal @ref=@addMaterialModal OnSubmit="@SubmitAddMaterial"></AddMaterialModal>
+    <EditMaterialModal @ref=@editMaterialModal OnSubmit="@SubmitEditMaterial"></EditMaterialModal>
+    <DeleteMaterialModal @ref=deleteMaterialModal OnSubmit="@SumbitDeleteMaterial"></DeleteMaterialModal>
+}
+
+@code 
+{
+    [Parameter]
+    public string? StrId { get; set; }
+    private int id;
+    private Request? request;
+    private Material selected;
+    private AddMaterialModal addMaterialModal;
+    private EditMaterialModal editMaterialModal;
+    private DeleteMaterialModal deleteMaterialModal;
+    string selectedTab = "request";
+
+    protected override async Task OnInitializedAsync()
+    {
+        id = Convert.ToInt32(StrId);
+        request = await requestService.Get(id);
+    }
+
+    private Task OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+
+        return Task.CompletedTask;
+    }
+
+    private async void ShowDelete()
+    {
+        await deleteMaterialModal.Show(selected);
+    }
+
+    private async void SumbitDeleteMaterial(Material m)
+    {
+        await materialService.Delete(m.Id);
+        request = await requestService.Get(request.Id);
+        StateHasChanged();
+    }
+
+    private async void ShowCreate()
+    {
+        await addMaterialModal.Show(request);
+    }
+
+    private async void SubmitAddMaterial(Material m)
+    {
+        await materialService.Create(m);
+        request = await requestService.Get(request.Id);
+        StateHasChanged();
+    }
+
+    private async void ShowEdit()
+    {
+        await editMaterialModal.Show(request, selected);
+    }
+
+    private async void SubmitEditMaterial(Material m)
+    {
+        await materialService.Edit(m);
+    }
+}

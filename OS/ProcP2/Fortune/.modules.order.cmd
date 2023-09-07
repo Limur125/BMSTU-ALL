@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/OS/ProcP2/Fortune/modules.order := {   echo /media/alexey/5CF228A5F228857C/zolot/OS/ProcP2/Fortune/fortune.ko; :; } | awk '!x[$$0]++' - > /media/alexey/5CF228A5F228857C/zolot/OS/ProcP2/Fortune/modules.order

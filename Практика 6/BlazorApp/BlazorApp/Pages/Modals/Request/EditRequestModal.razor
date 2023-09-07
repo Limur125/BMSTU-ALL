@@ -1,0 +1,49 @@
+﻿@using Blazorise.Extensions
+@using BlazorApp.Data
+
+<Modal @ref="@modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Изменить заявку</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Автор</FieldLabel>
+                <TextEdit  @bind-Text="@request.Author"></TextEdit>
+            </Field>
+            <Field>
+                <FieldLabel>Подразделение</FieldLabel>
+                <TextEdit @bind-Text="@request.Department"></TextEdit>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Отменить</Button>
+            <Button Color="Color.Primary" Clicked="@SaveRequest">Сохранить</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    [Parameter]
+    public EventCallback<Request> OnSubmit { get; set; }
+    private Modal modalRef;
+    private Request request = new();
+
+    public async Task Show(Request r)
+    {
+        request = (Request) r.Clone();
+        await modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+
+    private async Task SaveRequest()
+    {
+        await OnSubmit.InvokeAsync(request);
+        await modalRef.Hide();
+    }
+}
