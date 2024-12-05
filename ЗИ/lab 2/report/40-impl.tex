@@ -1,0 +1,181 @@
+\chapter{Технологический раздел}
+\label{cha:impl}
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы использовался язык программирования С++ \cite{cplusplus}, так как он позволяет работать с файлами и массивами. В качестве среды разработки использовалась Visual Studio Code \cite{vscode}.
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{code:rotor}--\ref{code:enigma} представлена реализация алгоритма шифрования DES.
+
+\begin{lstlisting}[label=code:rotor,caption=Функция шифрования файла]
+int FileEncryption::cipher(string input, string output, bool mode)
+{
+	ifstream ifile;
+	ofstream ofile;
+	ui64 buffer;
+	
+	if(input.length()  < 1) 
+	ifile = ifstream(stdin);
+	else
+	ifile.open(input, ios::binary | ios::in | ios::ate);
+	
+	if(output.length() < 1) 
+	ofile = ofstream(stdout);
+	else
+	ofile.open(output, ios::binary | ios::out);
+	
+	ui64 size = ifile.tellg();
+	ifile.seekg(0, ios::beg);
+	
+	ui64 block = size / 8;
+	if(mode) block--;
+	
+	for(ui64 i = 0; i < block; i++)
+	{
+		ifile.read((char*) &buffer, 8);
+		if (mode)
+		buffer = des.decrypt(buffer);
+		else
+		buffer = des.encrypt(buffer);
+		
+		ofile.write((char*) &buffer, 8);
+	}
+	
+	if(mode == false)
+	{
+		ui8 padding = 8 - (size % 8);
+		
+		if (padding == 0)
+		padding  = 8;
+		
+		buffer = (ui64) 0;
+		if(padding != 8)
+		ifile.read((char*) &buffer, 8 - padding);
+		
+		ui8 shift = padding * 8;
+		buffer <<= shift;
+		buffer  |= (ui64) 0x0000000000000001 << (shift - 1);
+		
+		buffer = des.encrypt(buffer);
+		ofile.write((char*) &buffer, 8);
+	}
+	else
+	{
+		ifile.read((char*) &buffer, 8);
+		buffer = des.decrypt(buffer);
+		
+		ui8 padding = 0;
+		
+		while(!(buffer & 0x00000000000000ff))
+		{
+			buffer >>= 8;
+			padding++;
+		}
+		
+		buffer >>= 8;
+		padding++;
+		
+		if(padding != 8)
+		ofile.write((char*) &buffer, 8 - padding);
+	}
+	
+	ifile.close();
+	ofile.close();
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=code:reflector,caption=Функция шифратора]
+ui64 DES::des(ui64 block, bool mode)
+{
+	block = ip(block);
+	
+	ui32 L = (ui32) (block >> 32) & L64_MASK;
+	ui32 R = (ui32) (block & L64_MASK);
+	
+	for (ui8 i = 0; i < 16; i++)
+	{
+		ui32 F;
+		if (mode)
+		F = f(R, sub_key[15 - i]);
+		else
+		F = f(R, sub_key[i]);
+		ui32 temp = R;
+		R = L ^ F;
+		L = temp;
+	}
+	
+	block = (((ui64) R) << 32) | (ui64) L;
+	return fp(block);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=code:enigma,caption=Функция Фейстеля]
+ui32 DES::f(ui32 R, ui64 k)
+{
+	ui64 s_input = 0;
+	for (ui8 i = 0; i < 48; i++)
+	{
+		s_input <<= 1;
+		s_input |= (ui64) ((R >> (32-EXPANSION[i])) & LB32_MASK);
+	}
+	s_input = s_input ^ k;
+	ui32 s_output = 0;
+	for (ui8 i = 0; i < 8; i++)
+	{
+		char s = (s_input >> (42 - 6 * i)) & 0x3f;
+		char row = ((s >> 4) & 0b10) | s & 1;
+		char column = (s >> 1) & 0b1111;
+		
+		s_output <<= 4;
+		s_output |= (ui32) (SBOX[i][16*row + column] & 0x0f);
+	}
+	
+	ui32 f_result = 0;
+	for (ui8 i = 0; i < 32; i++)
+	{
+		f_result <<= 1;
+		f_result |= (s_output >> (32 - PBOX[i])) & LB32_MASK;
+	}
+	
+	return f_result;
+}
+\end{lstlisting}
+
+\section{Тестирование реализации алгоритма}
+
+Было проведено тестирование на следующих входных данных:
+
+1. Входящая последовательность байтов:
+
+D09BD0B8D0BDD0B5D0B9D0BDD18BD0B9
+
+Зашифрованный текст:
+
+AB3B4DA99A15DCA7C13358E9D65EA07F
+	 
+Расшифрованная последовательность байтов:
+
+D09BD0B8D0BDD0B5D0B9D0BDD18BD0B9
+
+2. Входящая последовательность байтов:
+
+4141414141414141
+
+Зашифрованная последовательность байтов:
+
+4D41E973A3BF9604
+
+Расшифрованная последовательность байтов:
+
+4141414141414141
+
+
+Все тесты пройдены успешно.
+
+\section*{Вывод}
+В данном разделе были перечислены средства разработки, с помощью которых был реализованы алгоритм шифрования DES, приведена реализация алгоритма.
+
+

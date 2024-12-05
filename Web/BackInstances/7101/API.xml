@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>API</name>
+    </assembly>
+    <members>
+        <member name="M:API.Controllers.gamesController.GetAllGames(System.Int32,System.Int32)">
+            <summary>Получить список игр</summary>
+            <param name="skip">Кол-во игр которое нужно пропустить перед чтением</param>
+            <param name="limit">Число игр, которое нужно вернуть</param>
+            <returns>Список игр</returns>
+            <response code="200" cref="T:System.Collections.Generic.List`1">Информация об играх</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.gamesController.GetGame(System.Int32)">
+            <summary>Получить информацию и статистику об игре</summary>
+            <param name="Id">ID игры</param>
+            <returns>Инфромацию об игре</returns>
+            <response code="200" cref="T:API.Schemas.GameInfo">Информация об играх</response>
+            <response code="404">Игра не найдена</response>
+            <response code="405">Невалидный Id</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.gamesController.Create(API.Schemas.Game)">
+            <summary>Добавить игру</summary>
+            <param name="game">Добавляемая игра</param>
+            <returns>Успешная операция</returns>
+            <response code="201">Создание успешно</response>
+            <response code="400">Невалидные данные</response>
+            <response code="401">Пользователь неавторизован</response>
+            <response code="403">Недостаточно прав</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.gamesController.Delete(System.Int32)">
+            <summary>Удалить игру</summary>
+            <param name="Id">Id удаляемой игры</param>
+            <returns>Успешная операция</returns>
+            <response code="200">Добавление успешно</response>
+            <response code="400">Невалидные данные</response>
+            <response code="401">Пользователь неавторизован</response>
+            <response code="403">Недостаточно прав</response>
+            <response code="404">Игра не найдена</response>
+            <response code="405">Невалидный Id</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.gamesController.Patch(System.Int32,API.Schemas.Game)">
+            <summary>Изменить игру</summary>
+            <param name="Id">Id изменяемой игры</param>
+            <param name="game">Данные изменяемой игры</param>
+            <returns>Успешная операция</returns>
+            <response code="200">Изменение успешно</response>
+            <response code="400">Невалидные данные</response>
+            <response code="401">Пользователь неавторизован</response>
+            <response code="403">Недостаточно прав</response>
+            <response code="404">Игра не найдена</response>
+            <response code="405">Невалидный Id</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.reviewsController.GetAll(System.Int32,System.Int32,System.Int32)">
+            <summary>Получить список отзывов об игре</summary>
+            <param name="Id">ID игры</param>
+            <param name="skip">Кол-во отзывов, которое нужно пропустить перед чтением</param>
+            <param name="limit">Число отзывов, которое нужно вернуть</param>
+            <returns>Список отзывов</returns>
+            <response code="200" cref="T:System.Collections.Generic.List`1">Успешная операция</response>
+            <response code="400">Невалидные данные</response>
+            <response code="404">Игра не найдена</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.reviewsController.Create(System.Int32,API.Review)">
+            <summary>Добавить отзыв об игре</summary>
+            <param name="Id">ID игры</param>
+            <param name="review">Добавляемый отзыв</param>
+            <returns>Успешная операция</returns>
+            <response code="201">Создание успешно</response>
+            <response code="400">Невалидные данные</response>
+            <response code="401">Пользователь неавторизован</response>
+            <response code="404">Игра не найдена</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.reviewsController.Delete(System.Int32,System.String)">
+            <summary>Удалить отзыв об игре</summary>
+            <param name="Id">ID игры</param>
+            <param name="username">Имя пользователя</param>
+            <returns>Успешная операция</returns>
+            <response code="200">Удаление успешно</response>
+            <response code="401">Пользователь неавторизован</response>
+            <response code="403">Недостаточно прав</response>
+            <response code="404">Отзыв не найден</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.time_recordsController.GetAll(System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>Получить временные отметки игры</summary>
+            <param name="Id">ID игры</param>
+            <param name="skip">Кол-во временных отметок, которое нужно пропустить перед чтением</param>
+            <param name="limit">Число временных отметок, которое нужно вернуть</param>
+            <param name="username">Имя пользователя</param>
+            <returns>Список временных отметок</returns>
+            <response code="200" cref="T:System.Collections.Generic.List`1">Успешная операция</response>
+            <response code="400">Невалидные данные</response>
+            <response code="404">Игра не найдена</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.time_recordsController.Create(System.Int32,API.Schemas.Time_record)">
+            <summary>Добавить временную отметку игре</summary>
+            <param name="Id">ID игры</param>
+            <param name="record">Добавляемая временная отметка</param>
+            <returns>Успешная операция</returns>
+            <response code="201">Создание успешно</response>
+            <response code="400">Невалидные данные</response>
+            <response code="401">Пользователь неавторизован</response>
+            <response code="404">Игра не найдена</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.time_recordsController.Delete(System.Int32,System.Int32)">
+            <summary>Удалить временную отметку игры</summary>
+            <param name="Id">ID игры</param>
+            <param name="time_record_id">Id временной отметки</param>
+            <returns>Успешная операция</returns>
+            <response code="200">Удаление успешно</response>
+            <response code="400">Невалидные данные</response>
+            <response code="401">Пользователь неавторизован</response>
+            <response code="403">Недостаточно прав</response>
+            <response code="404">Временная отметка не найдена</response>
+            <response code="405">Невалидный Id</response>
+            <response code="500">Внутреняя ошибка сервера</response>
+        </member>
+        <member name="M:API.Controllers.userController.LogIn(API.User)">
+            <summary>
+            Войти в аккаунт
+            </summary>
+            <param name="user">User's email</param>
+            <returns>Token</returns>
+            <response code="200" cref="T:System.String">Уcпешная авторизация</response>
+            <response code="400">Некорректный логин или пароль пароль</response>
+        </member>
+        <member name="M:API.Controllers.userController.Register(API.User)">
+            <summary>
+            Регистрация
+            </summary>
+            <param name="user">Пользователь</param>
+            <returns>Token</returns>
+            <response code="200" cref="T:System.String">Регистрация успешна</response>
+            <response code="400">Пользователь существует</response>
+        </member>
+        <member name="M:API.Controllers.userController.Logout">
+            <summary>
+            Выйти из аккаунта
+            </summary>
+            <response code="200" cref="T:System.String">Выход успешен</response>
+            <response code="401">Пользователь неавторизован</response>
+        </member>
+    </members>
+</doc>

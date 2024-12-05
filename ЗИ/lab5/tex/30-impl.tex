@@ -1,0 +1,70 @@
+\chapter{ТЕХНОЛОГИЧЕСКАЯ ЧАСТЬ}
+
+
+\section{Выбор средств реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы
+использовался язык программирования С, так как он позволяет работать с файлами и
+массивами. В качестве среды разработки использовалась Visual Studio.
+
+\section{Реализация алгоритма Хаффмана}
+
+В листингах~\ref{lst:create-server} представлена реализация алгоритма Хаффмана.
+
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:create-server, caption=Реализация алгоритма Хаффмана]
+Node* generate_huffman_tree(const std::map <char, ll>& value) {
+	std::vector<Node*> store = sort_by_character_count(value);
+	Node* one, * two, * parent;
+	sort(begin(store), end(store), sortbysec);
+	if (store.size() == 1) {
+		return combine(store.back(), nullptr);
+	}
+	while (store.size() > 2) {
+		one = *(store.end() - 1); two = *(store.end() - 2);
+		parent = combine(one, two);
+		store.pop_back(); store.pop_back();
+		store.push_back(parent);
+		
+		std::vector<Node*>::iterator it1 = store.end() - 2;
+		while ((*it1)->count < parent->count && it1 != begin(store)) {
+			--it1;
+		}
+		std::sort(it1, store.end(), sortbysec);
+	}
+	one = *(store.end() - 1); two = *(store.end() - 2);
+	return combine(one, two);
+}
+\end{lstlisting}
+
+\section{Тестирование}
+
+\textbf{Тест с одной буквой}
+
+Исходный размер файла = 8 байт
+
+Размер сжатого файла = 6 байт
+
+Исходный текст = 3131 3131 3131 3131
+
+Сжатый текст = 6100 3101 ff00
+
+\textbf{Тест с двумя буквами и частотой 3:1}
+
+Исходный размер файла = 8 байт
+
+Размер сжатого файла = 9 байт
+
+Исходный текст = 3131 3132 3131 3132
+
+Сжатый текст = 6101 3001 0162 0031 0011
+
+\textbf{Тест с тремя буквами и частотой 1:1:1}
+
+Исходный размер файла = 9 байт
+
+Размер сжатого файла = 15 байт
+
+Исходный текст = 3132 3331 3233 3132 3300
+
+Сжатый текст = 6102 3101 0262 3030 0263 3130 8c01 0062

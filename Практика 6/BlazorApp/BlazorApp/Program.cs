@@ -24,7 +24,7 @@ namespace BlazorApp
 
             builder.Services.AddDbContextFactory<PurchaseContext>(
                 options => options.UseSqlServer(
-                    "Server=192.168.0.195,1433;Database=blazorappdb;User ID=SA;Password=Password_1;TrustServerCertificate=True;",
+                    "Server=localhost,1433;Database=blazorappdb;User ID=SA;Password=Password_1;TrustServerCertificate=True;",
                     option => option.CommandTimeout(60)).UseQueryTrackingBehavior(
                     QueryTrackingBehavior.NoTrackingWithIdentityResolution));
 

@@ -1,0 +1,79 @@
+\chapter{Технологический раздел}
+\label{cha:impl}
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы использовался язык программирования С \cite{c_lang}, так как он позволяет работать с файлами и  строками. В качестве среды разработки использовалась Visual Studio.
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{code:struct}, \ref{code:enigma} представлена реализация алгоритма работы шифровальной машины ``Энигма''.
+
+\begin{lstlisting}[label=code:struct, caption=Структура enigma\_t]
+typedef struct enigma_t 
+{
+	int counter;
+	int size_rotor;
+	int num_rotors;
+	char* reflector;
+	char* com_panel;
+	char** rotors;
+} enigma_t;
+\end{lstlisting}
+
+\begin{lstlisting}[label=code:enigma,caption=Реализация алгоритма работы шифровальной машины ``Энигма'']
+char enigma_encrypt(enigma_t* enigma, char ch, int* rc) 
+{
+	int rotor_queue;
+	char new_ch;
+	if (ch - 'A' >= enigma->size_rotor) {
+		*rc = 0;
+		return 0;
+	}
+	new_ch = enigma->com_panel[ch - 'A'];
+	for (int i = 0; i < enigma->num_rotors; i++)
+		new_ch = enigma->rotors[i][new_ch - 'A'];
+	new_ch = enigma->reflector[new_ch - 'A'];
+	for (int i = enigma->num_rotors - 1; i >= 0; i--) 
+	{
+		new_ch = enigma_rotor_find(enigma, i, new_ch, rc);
+		if (*rc != 0) 
+			return 0;
+	}
+	new_ch = enigma->com_panel[ch - 'A'];
+	rotor_queue = 1;
+	enigma->counter += 1;
+	for (int i = 0; i < enigma->num_rotors; i++) 
+	{
+		if (enigma->counter % rotor_queue == 0) 
+			enigma_rotor_shift(enigma, i);
+		rotor_queue *= enigma->size_rotor;
+	}
+	*rc = 0;
+	return new_ch;
+}
+\end{lstlisting}
+
+\section{Тестирование}
+
+В списке приведены тесты для функции, реализующей алгоритм шифрования машины ``Энигма''.
+
+\begin{table}[H]
+	\begin{center}
+		\caption{\label{tbl:test} Функциональные тесты}
+		\begin{tabular}{|c|c|c|}
+			\hline
+			Исходный текст&Зашифрованный текст&Расшифрованный текст \\
+			\hline
+			ААААААА&BDXZBDF&ААААААА \\
+			\hline
+			HELLOWORLD&RSMONISVWN&HELLOWORLD\\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\section*{Вывод}
+В данном разделе были перечислены средства разработки, с помощью которых были реализованы алгоритм работы шифровальной машины ``Энигма'', приведена реализация алгоритма.
+
+

@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/accelerator.ko := ld -r -m elf_x86_64 -z noexecstack --build-id=sha1  -T scripts/module.lds -o /media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/accelerator.ko /media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/accelerator.o /media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/accelerator.mod.o;  true

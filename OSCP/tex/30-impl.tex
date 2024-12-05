@@ -1,0 +1,159 @@
+\chapter{ТЕХНОЛОГИЧЕСКАЯ ЧАСТЬ}
+
+\section{Выбор средств реализации}
+
+В качестве языка программирования был выбран язык C. На этом языке
+реализованы все модули ядра и драйверы операционной системы Linux.
+
+\section{Реализация изменения чувствительности мыши}
+
+В листинге~\ref{lst:mouse-irq} представлена реализация алгоритма перехвата событий мыши. 
+
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:mouse-irq, caption= Реализация алгоритма перехвата событий мыши]
+static void usb_mouse_irq(struct urb *urb)
+{
+	struct usb_mouse *mouse = urb->context;
+	signed char *data = mouse->data;
+	struct input_dev *dev = mouse->dev;
+	int status;
+	
+	float delta_x = data[1] * PRE_SCALE_X;
+	float delta_y = data[2] * PRE_SCALE_Y;
+	
+	static float carry_x = 0.0f;
+	static float carry_y = 0.0f;
+	
+	analyze_wheel(&delta_x, &delta_y, data[3]);
+	
+	delta_x *= POST_SCALE_X;
+	delta_y *= POST_SCALE_Y;
+	delta_x += carry_x;
+	delta_y += carry_y;
+	carry_x = delta_x - my_round(delta_x);
+	carry_y = delta_y - my_round(delta_y);
+	
+	switch (urb->status) {
+		case 0:	
+		break;
+		case -ECONNRESET:
+		case -ENOENT:
+		case -ESHUTDOWN:
+		return;
+		default:
+		goto resubmit;
+	}
+	
+	input_report_key(dev, BTN_LEFT,   data[0] & 0x01);
+	input_report_key(dev, BTN_RIGHT,  data[0] & 0x02);
+	input_report_key(dev, BTN_MIDDLE, data[0] & 0x04);
+	input_report_key(dev, BTN_SIDE,   data[0] & 0x08);
+	input_report_key(dev, BTN_EXTRA,  data[0] & 0x10);
+	
+	input_report_rel(dev, REL_X,     Leet_round(delta_x));
+	input_report_rel(dev, REL_Y,     Leet_round(delta_y));
+	input_report_rel(dev, REL_WHEEL, data[3]);
+	
+	input_sync(dev);
+	resubmit:
+	status = usb_submit_urb (urb, GFP_ATOMIC);
+	if (status)
+	dev_err(&mouse->usbdev->dev,
+	"can't resubmit intr, %s-%s/input0, status %d\n",
+	mouse->usbdev->bus->bus_name,
+	mouse->usbdev->devpath, status);
+}
+\end{lstlisting}
+
+В листинге~\ref{lst:mouse-anal} представлена реализация алгоритма анализа событий колесика мыши. 
+
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:mouse-anal, caption= Реализация анализа событий колесика мыши]
+	static void analyze_wheel(float *delta_x, float *delta_y, int wheel)
+	{
+		
+		if(wheel > 0)
+		{
+			printk("ACCELERATOR: Increase mouse speed. accel_sens = %d", (int)(accel_sens*10));
+			accel_sens += ACCELERATION;
+			if (SENS_CAP > 0 && accel_sens >= SENS_CAP) {
+				accel_sens = SENS_CAP;
+			}
+			
+		}
+		else if(wheel < 0)
+		{
+			printk("ACCELERATOR: Decrease mouse speed. accel_sens = %d", (int)(accel_sens*10));
+			accel_sens -= ACCELERATION;
+			if (accel_sens < 0.1f) {
+				accel_sens = 0.1f;
+			}
+			
+		}
+		
+		accel_sens /= SENSITIVITY;
+		*delta_x *= accel_sens;
+		*delta_y *= accel_sens;
+	}
+\end{lstlisting}
+
+Для определения нажатой клавиши используется поле \textit{data} из структуры usb\_mouse. Биты байта \textit{data[0]} отвечают за тип нажатой клавиши. Байты \textit{data[1]} и \textit{data[2]} отвечают за перемещение мыши горизонтали и вертикали соответственно. Байт \textit{data[3}] отвечает за вращение колесика мыши, при вращении вверх он равен $1$, при вращении вниз --- $-1$, когда колесико не вращают --- нулю.
+
+\section{Реализация функции регистрации драйвера}
+
+В приложении А представлена реализация функции probe.
+
+В листинге~\ref{lst:disconnect} представлена реализация функции disconnect.
+\begin{lstlisting}[label=lst:disconnect, caption=Реализация функции disconnect]
+static void usb_mouse_disconnect(struct usb_interface *intf)
+{
+	struct usb_mouse *mouse = usb_get_intfdata (intf);
+	
+	usb_set_intfdata(intf, NULL);
+	if (mouse) {
+		usb_kill_urb(mouse->irq);
+		input_unregister_device(mouse->dev);
+		usb_free_urb(mouse->irq);
+		usb_free_coherent(interface_to_usbdev(intf), 8, mouse->data, mouse->data_dma);
+		kfree(mouse);
+	}
+}
+\end{lstlisting}
+
+В листинге~\ref{lst:open} представлена реализация функции open.
+\begin{lstlisting}[label=lst:open, caption=Реализация функции open]
+static int usb_mouse_open(struct input_dev *dev)
+{
+	struct usb_mouse *mouse = input_get_drvdata(dev);
+	
+	mouse->irq->dev = mouse->usbdev;
+	if (usb_submit_urb(mouse->irq, GFP_KERNEL))
+		return -EIO;
+	
+	return 0;
+}
+\end{lstlisting}
+
+В листинге~\ref{lst:close} представлена реализация функции close.
+\begin{lstlisting}[label=lst:close, caption=Реализация функции close]
+static void usb_mouse_close(struct input_dev *dev)
+{
+	struct usb_mouse *mouse = input_get_drvdata(dev);
+	
+	usb_kill_urb(mouse->irq);
+}
+\end{lstlisting}
+
+\section{Реализация Makefile}
+
+В листинге~\ref{lst:make} представлена реализация Makefile.
+\begin{lstlisting}[label=lst:make, caption=Реализация Makefile]
+obj-m += accelerator.o
+ccflags-y += -msse -mpreferred-stack-boundary=4
+
+all:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+
+clean:
+	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+\end{lstlisting}
