@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="CudaRayTracing.cu" />
+    <CudaCompile Include="CudaRayTracing.cuh" />
+    <CudaCompile Include="PairDouble.hpp">
+      <Filter>CudaModels</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Vector3.hpp">
+      <Filter>CudaModels</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Ray.hpp">
+      <Filter>CudaModels</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RaySection.hpp">
+      <Filter>CudaModels</Filter>
+    </CudaCompile>
+    <CudaCompile Include="LightRay.hpp">
+      <Filter>CudaModels</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Cylinder.hpp">
+      <Filter>CudaModels</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Model">
+      <UniqueIdentifier>{6a89b988-bd10-4edd-b539-d1d496bc3b8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CudaModels">
+      <UniqueIdentifier>{7596c1c4-519b-444b-be07-33e0657128a8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Lamp.hpp">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsFunctions.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Reader.hpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsFunctions.cpp" />
+  </ItemGroup>
+</Project>
