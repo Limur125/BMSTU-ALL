@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/Module.symvers :=  scripts/mod/modpost -m -a     -o /media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/Module.symvers -T /media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/modules.order -i Module.symvers -e 

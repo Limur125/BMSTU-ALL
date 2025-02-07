@@ -1,0 +1,1017 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API для обслуживания клиентов сети отелей - OpenAPI 3.0",
+    "description": "Данное API позволит автоматизировать бронирование номеров клиентами.",
+    "contact": {
+      "email": "glebka.vagapov@mail.ru"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "hotels",
+      "description": "Операции с отелями"
+    },
+    {
+      "name": "rooms",
+      "description": "Операции с номерами в отелях"
+    },
+    {
+      "name": "users",
+      "description": "Операции с пользователями"
+    },
+    {
+      "name": "reservations",
+      "description": "Операции с бронями номеров отелей"
+    }
+  ],
+  "paths": {
+    "/hotels": {
+      "post": {
+        "tags": [
+          "hotels"
+        ],
+        "summary": "Добавить новый отель",
+        "operationId": "addHotel",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Hotels"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Отель добавлен"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "hotels"
+        ],
+        "summary": "Получить список отелей",
+        "operationId": "getHotelsList",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "description": "Расположение отелей",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "starsNumber",
+            "in": "query",
+            "description": "Количество звёзд отелей",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Лимит количества отелей для возврата",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "skipped",
+            "in": "query",
+            "description": "Сдвиг возврата в коллекции отелей",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список отелей получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Hotels"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    },
+    "/hotels/{id}": {
+      "put": {
+        "tags": [
+          "hotels"
+        ],
+        "summary": "Обновить существующий отель",
+        "operationId": "updateHotel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id отеля",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Hotels"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Отель обновлён"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Отель с указанным идентификатором не найден"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "hotels"
+        ],
+        "summary": "Удалить существующий отель",
+        "operationId": "deleteHotel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id удаляемого отеля",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Отель удалён"
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Отель с указанным идентификатором не найден"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "hotels"
+        ],
+        "summary": "Получить отель",
+        "operationId": "getHotel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id отеля",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Отель получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Hotels"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Отель с указанным идентификатором не найден"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    },
+    "/rooms": {
+      "post": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Добавить новый номер",
+        "operationId": "addRoom",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rooms"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Номер добавлен"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Получить список номеров",
+        "operationId": "getRoomsList",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Тип номеров",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Лимит количества номеров для возврата",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "skipped",
+            "in": "query",
+            "description": "Сдвиг возврата в коллекции номеров",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список номеров получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rooms"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    },
+    "/rooms/{id}": {
+      "put": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Обновить существующий номер",
+        "operationId": "updateRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id номера",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Rooms"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Номер обновлён"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Номер с указанным идентификатором не найден"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Удалить существующий номер",
+        "operationId": "deleteRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id удаляемого номера",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Номер удалён"
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Номер с указанным идентификатором не найден"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "rooms"
+        ],
+        "summary": "Получить номер",
+        "operationId": "getRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id номера",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Номер получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rooms"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Номер с указанным идентификатором не найден"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Добавить нового пользователя",
+        "operationId": "addUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Users"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Пользователь добавлен"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Аутентификация",
+        "operationId": "authentication",
+        "parameters": [
+          {
+            "name": "login",
+            "in": "query",
+            "description": "Логин пользователя",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "description": "Пароль пользователя",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Аутентификация успешна",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Users"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Обновить существующего пользователя",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id пользователя",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Users"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Пользователь обновлён"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Пользователь с указанным идентификатором не найден"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Удалить существующего пользователя",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id удаляемого пользователя",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь удалён"
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Пользователь с указанным идентификатором не найден"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Получить пользователя",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id пользователя",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Users"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Пользователь с указанным идентификатором не найден"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    },
+    "/reservations": {
+      "post": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Добавить новую бронь",
+        "operationId": "addReservation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reservations"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Бронь добавлена"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Получить список броней",
+        "operationId": "getReservationsList",
+        "parameters": [
+          {
+            "name": "hotelId",
+            "in": "query",
+            "description": "id отеля",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "description": "Дата начала интервала броней",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "description": "Дата окончания интервала броней",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список броней получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reservations"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    },
+    "/reservations/{id}": {
+      "put": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Обновить существующую бронь",
+        "operationId": "updateReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id брони",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reservations"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Бронь обновлена"
+          },
+          "400": {
+            "description": "Невалидные данные"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Бронь с указанным идентификатором не найдена"
+          },
+          "409": {
+            "description": "Конфликт"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Удалить существующую бронь",
+        "operationId": "deleteReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id удаляемой брони",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Бронь удалена"
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Бронь с указанным идентификатором не найдена"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Получить бронь",
+        "operationId": "getReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id брони",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Бронь получена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reservations"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Невалидный id"
+          },
+          "403": {
+            "description": "Недостаточно прав"
+          },
+          "404": {
+            "description": "Бронь с указанным идентификатором не найдена"
+          },
+          "500": {
+            "description": "Внутренняя ошибка работы сервера"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Hotels": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Идентификатор отеля",
+            "type": "integer",
+            "example": 10
+          },
+          "location": {
+            "description": "Город, в котором находится отель",
+            "type": "string",
+            "example": "Moscow"
+          },
+          "starsNumber": {
+            "description": "Количество звезд отеля (от 1 до 5)",
+            "type": "integer",
+            "example": 3
+          }
+        }
+      },
+      "Rooms": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Идентификатор номера",
+            "type": "integer",
+            "example": 10
+          },
+          "hotelId": {
+            "description": "Идентификатор отеля, в котором находится номер",
+            "type": "integer",
+            "example": 10
+          },
+          "type": {
+            "description": "Тип комнаты: 1 - супер эконом, 2 - эконом, 3 - комфорт, 4 - люкс, 5 - премиум (от 1 до 5)",
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "Users": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 10,
+            "description": "Идентификатор пользователя"
+          },
+          "login": {
+            "type": "string",
+            "example": "ivan1996",
+            "description": "Логин пользователя"
+          },
+          "password": {
+            "type": "string",
+            "example": "qwerty",
+            "description": "Пароль пользователя"
+          },
+          "isAdmin": {
+            "type": "boolean",
+            "example": true,
+            "description": "Флаг администратора"
+          }
+        }
+      },
+      "Reservations": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 10,
+            "description": "Идентификатор брони"
+          },
+          "hotelId": {
+            "type": "integer",
+            "example": 10,
+            "description": "Идентификатор отеля, в котором забронирован номер"
+          },
+          "roomId": {
+            "type": "integer",
+            "example": 10,
+            "description": "Идентификатор забронированного номера"
+          },
+          "userId": {
+            "type": "integer",
+            "example": 10,
+            "description": "Идентификатор пользователя, забронировавшего номер"
+          },
+          "startDate": {
+            "type": "string",
+            "example": "2024-03-22",
+            "description": "Дата начала брони"
+          },
+          "endDate": {
+            "type": "string",
+            "example": "2024-03-22",
+            "description": "Дата окончания брони"
+          }
+        }
+      }
+    }
+  }
+}

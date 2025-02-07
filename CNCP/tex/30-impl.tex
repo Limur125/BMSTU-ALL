@@ -1,0 +1,175 @@
+\chapter{ТЕХНОЛОГИЧЕСКАЯ ЧАСТЬ}
+
+В этом разделе будут выбраны средства реализации программного обеспечения. Будет выбран язык программирования. Будет приведена демонстрация работы программы.
+
+\section{Выбор средств реализации}
+
+В качестве языка программирования был выбран C в соответствии с заданием на курсовую работу. В качестве мультиплексора был выбран select в соответствии с заданием на курсовую работу. Для параллелизации обработки пользовательских запросов был использован пул потоков.
+
+\section{Реализация веб-сервера}
+
+Функция запуска сервера приведена в листинге~\ref{lst:create-server}.
+
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:create-server, caption=Запуск сервера]
+int serve(uint16_t port)
+{
+	tpool_t *tm = tpool_create(THREAD_POOL_CAPACITY);
+	
+	int serverSocket = socket(AF_INET, SOCK_STREAM,	0);
+	int reuse = 1;
+	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
+		errorHandler(ERROR, "setsockopt() failed", "", 0);
+		return EXIT_FAILURE;
+	}
+	
+	struct sockaddr_in serverAddress;
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_port = htons(port);
+	serverAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	
+	int bound = bind(serverSocket, (struct sockaddr *) &serverAddress, sizeof(serverAddress));
+	if (bound != 0) {
+		char portString[5 + MAX_PORT_DIGITS];
+		sprintf(portString, "port %d", port);
+		errorHandler(ERROR, "Socket not bound", portString, 0);
+		return EXIT_FAILURE;
+	}
+	
+	int listening = listen(serverSocket, BACKLOG);
+	if (listening < 0) {
+		printf("Error: The server is not listening.\n");
+		return EXIT_FAILURE;
+	}
+	report(&serverAddress);
+	int clientSocket;
+	fd_set client_fds;
+	while(1) {
+		FD_ZERO(&client_fds);
+		FD_SET(serverSocket, &client_fds);
+		if (select(serverSocket + 1,&client_fds, NULL,NULL,NULL) == -1)
+		{
+			errorHandler(ERROR, strerror(errno),  NULL, 0);
+			return EXIT_FAILURE;
+		}
+		if(FD_ISSET(serverSocket, &client_fds))
+		{
+			threadData_t *data = calloc(1, sizeof(threadData_t));
+			LogData *log = calloc(1, sizeof(*log));
+			log->clientAddr = calloc(1, sizeof(*log->clientAddr));
+			log->req = NULL;
+			clientSocket = acceptTCPConnection(serverSocket, log);
+			if (clientSocket >=0 ) 
+			{
+				data->log = log;
+				data->socket = clientSocket;
+				tpool_add_work(tm, handleHTTPClient, data);
+			}
+		}
+	}
+	return 0;
+}
+\end{lstlisting}
+
+Функция обработки соединения с клиентом представлена в листинге~\ref{lst:client-process}
+
+\captionsetup{justification=raggedright,singlelinecheck=off}
+\begin{lstlisting}[label=lst:client-process, caption=Обработка клиентского соединения]
+void handleHTTPClient(void *arg)
+{
+	threadData_t* data = arg;
+	int clientSocket = data->socket;
+	LogData* log = data->log;
+	char recvBuffer[INPUT_BUFFER_SIZE];
+	memset(recvBuffer, 0, sizeof(char) * INPUT_BUFFER_SIZE);
+	
+	int nBytesReceived = recv(clientSocket, recvBuffer, sizeof(recvBuffer), 0);
+	if (nBytesReceived < 0) {
+		errorHandler(FORBIDDEN, "Failed to read request.", "", clientSocket);
+		freeLog(log);
+		free(data);
+		close(clientSocket);
+		return;	
+	}
+	if (nBytesReceived < INPUT_BUFFER_SIZE) {
+		recvBuffer[nBytesReceived] = 0;
+	} 
+	
+	char *response = NULL;
+	char *filename = NULL;
+	char *req = NULL;
+	firstLine(recvBuffer, &req);
+	char *tmpReq = realloc(log->req, (strlen(req) * sizeof(*(log->req))) + 1);
+	if (tmpReq == NULL) 
+	{
+		ErrorSystemMessage("Memory allocation: realloc() failure.");
+		free(response);
+		free(filename);
+		freeLog(log);
+		free(data);
+		close(clientSocket);
+		return;	
+	}
+	log->req = tmpReq;
+	strcpy(log->req, req);
+	free(req);
+	if (router(recvBuffer, clientSocket, &filename) != 0)
+	{
+		free(response);
+		free(filename);
+		freeLog(log);
+		free(data);
+		close(clientSocket);
+		return;
+	}
+	
+	ssize_t mimeTypeIndex = -1;
+	if ((mimeTypeIndex = fileTypeAllowed(filename)) == -1) {
+		free(filename);
+		errorHandler(FORBIDDEN, "mime type", "Requested file type not allowed.", clientSocket);
+		free(response);
+		freeLog(log);
+		free(data);
+		close(clientSocket);
+		return;
+	}
+	
+	if (setResponse(filename, &response, OK, mimeTypeIndex, clientSocket, log) != 0) {
+		free(response);
+		freeLog(log);
+		free(data);
+		close(clientSocket);
+		return;
+	}
+	
+	send(clientSocket, response, strlen(response) + 1, 0);
+	free(response);
+	free(filename);
+	logConnection(log);
+	free(data);
+	close(clientSocket);
+}
+\end{lstlisting}
+
+\section{Поддерживаемые запросы}
+
+Разработанный сервер может обработать GET и HEAD запросы. Когда клиент выполняет GET запрос, он получает в теле ответа запрошенный файл. Когда клиент выполняет HEAD запрос он в ответе получает только заголовки Content-Type и Content-Length. Ниже перечислены статусы ответов сервера, которые были реализованы.
+\begin{itemize}
+	\item[---] 200 — успешное завершение обработки запроса.
+	\item[---] 403 — доступ к запрошенному файлу запрещён, запрошен неподдерживаемый тип файла.
+	\item[---] 404 — запрашиваемый файл не найден.
+	\item[---] 405 — неподдерживаемый HTTP-метод (POST, PUT и т.д.).
+\end{itemize}
+
+В соответствии с заданием веб-сервер может отдавать файлы следующих форматов:
+\begin{itemize}
+	\item[---] html (text/html);
+	\item[---] css (text/css);
+	\item[---] js (text/javascript);
+	\item[---] png (image/png);
+	\item[---] jpg (image/jpg);
+	\item[---] jpeg (image/jpeg);
+	\item[---] gif (image/gif);
+	\item[---] svg (image/svg);
+	\item[---] swf (application/x-shockwave-flash).
+\end{itemize}

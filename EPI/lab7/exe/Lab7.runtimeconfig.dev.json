@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\zolot\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\zolot\\.nuget\\packages"
+    ]
+  }
+}

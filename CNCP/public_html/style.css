@@ -1,0 +1,23 @@
+/* Стиль для заголовка h1 */
+h1 {
+    color: blue;
+    font-size: 24px;
+}
+
+/* Стиль для параграфа */
+p {
+    color: green;
+    font-size: 16px;
+}
+
+/* Стиль для ссылки */
+a {
+    color: red;
+    text-decoration: none;
+}
+
+/* Стиль для изображения */
+img {
+    width: 200px;
+    height: auto;
+}

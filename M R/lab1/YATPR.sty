@@ -1,0 +1,31 @@
+%----------------------------------------------------------------------%
+%                                                                      %
+% Yet Another Term Paper Remarks                                       %
+% Copyright © Alexander Kostritsky (alexodnodvorcev@yandex.com)        %
+% If you are a nice person, feel free to use my style package!         %
+%                                                                      %
+% При обновлении файл будет заменён первоисточником из каталога        %
+% "C:\Users\alexodnodvorcev\LaTeX Studio", не редактируйте копии!      %
+%                                                                      %
+%----------------------------------------------------------------------%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{YATPR}[03/03/2020]
+%----------------------------------------------------------------------%
+\RequirePackage{ifthen}
+\RequirePackage{xkeyval}
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\RequirePackage{calc}
+\RequirePackage{graphicx}
+\RequirePackage[colorinlistoftodos, shadow]{todonotes}
+\newcommand{\koshi}[1]{\todo[color=red!50, fancyline]{#1}}
+\newcommand{\kosme}[1]{\todo[color=orange!50, fancyline]{#1}}
+\newcommand{\koslo}[1]{\todo[color=cyan!50, fancyline]{#1}}
+\newcommand{\koshii}[1]{\todo[color=red!50, inline]{#1}}
+\newcommand{\kosmei}[1]{\todo[color=orange!50, inline]{#1}}
+\newcommand{\kosloi}[1]{\todo[color=cyan!50, inline]{#1}}
+%----------------------------------------------------------------------%
+\endinput
+%----------------------------------------------------------------------%
+% End of file YATPR.sty %----------------------------------------------%
+%----------------------------------------------------------------------%

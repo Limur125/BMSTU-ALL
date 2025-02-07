@@ -1,0 +1,4 @@
+{
+  "Connection": "Data Source=localhost,3000;Database=GameTime;User ID=GuestUser;Password=GuestPassword1;Connect Timeout=10;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;",
+  "LogLevel": "Information"
+}

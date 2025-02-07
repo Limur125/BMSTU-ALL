@@ -1,0 +1,182 @@
+\chapter{Технологический раздел}
+\label{cha:impl}
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы использовался язык программирования С~\cite{cplusplus}, так как он позволяет работать с файлами и массивами. В качестве среды разработки использовалась Visual Studio~\cite{vscode}.
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{code:rsa}--\ref{code:sha} представлены реализации алгоритмов RSA и SHA1.
+
+\begin{lstlisting}[label=code:rsa,caption=Функция шифрования]
+static void bignum_pow_mod(bignum* result, bignum* base, bignum* expo, bignum* mod)
+{
+	bignum *a = bignum_alloc(), *b = bignum_alloc();
+	bignum *tmp = bignum_alloc();
+	
+	bignum_copy(base, a);
+	bignum_copy(expo, b);
+	bignum_fromint(result, 1);
+	
+	while(!bignum_iszero(b))
+	{
+		if(b->data[0] & 1)
+		{
+			bignum_imultiply(result, a);
+			bignum_imod(result, mod);
+		}
+		bignum_idivide_2(b);
+		bignum_copy(a, tmp);
+		bignum_imultiply(a, tmp);
+		bignum_imod(a, mod);
+	}
+	bignum_free(a);
+	bignum_free(b);
+	bignum_free(tmp);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=code:sha,caption=Функция хеширования]
+int calculate_sha1(struct sha* sha1, unsigned char* text, uint32_t length)
+{
+	unsigned int i, j;
+	unsigned char* buffer;
+	uint32_t bits;
+	uint32_t temp, k;
+	uint32_t lb = length * 8;
+	
+	bits = padded_length_in_bits(length);
+	buffer = (unsigned char*)malloc((bits / 8) + 8);
+	if (buffer == NULL)
+	{
+		printf("\nError allocating memory...");
+		return 1;
+	}
+	memcpy(buffer, text, length);
+	*(buffer + length) = 0x80;
+	for (i = length + 1; i < (bits / 8); i++)
+	*(buffer + i) = 0x00;
+	*(buffer + (bits / 8) + 4 + 0) = (lb >> 24) & 0xFF;
+	*(buffer + (bits / 8) + 4 + 1) = (lb >> 16) & 0xFF;
+	*(buffer + (bits / 8) + 4 + 2) = (lb >> 8) & 0xFF;
+	*(buffer + (bits / 8) + 4 + 3) = (lb >> 0) & 0xFF;
+	sha1->digest[0] = 0x67452301;
+	sha1->digest[1] = 0xEFCDAB89;
+	sha1->digest[2] = 0x98BADCFE;
+	sha1->digest[3] = 0x10325476;
+	sha1->digest[4] = 0xC3D2E1F0;
+	for (i = 0; i < ((bits + 64) / 512); i++)
+	{
+		for (j = 0; j < 80; j++)
+		sha1->w[j] = 0x00;
+		for (j = 0; j < 16; j++)
+		{
+			sha1->w[j] = buffer[j * 4 + 0];
+			sha1->w[j] = sha1->w[j] << 8;
+			sha1->w[j] |= buffer[j * 4 + 1];
+			sha1->w[j] = sha1->w[j] << 8;
+			sha1->w[j] |= buffer[j * 4 + 2];
+			sha1->w[j] = sha1->w[j] << 8;
+			sha1->w[j] |= buffer[j * 4 + 3];
+		}
+		for (j = 16; j < 80; j++)
+		sha1->w[j] = (ROTL(1, (sha1->w[j - 3] ^ sha1->w[j - 8] ^ sha1->w[j - 14] ^ sha1->w[j - 16])));
+		sha1->a = sha1->digest[0];
+		sha1->b = sha1->digest[1];
+		sha1->c = sha1->digest[2];
+		sha1->d = sha1->digest[3];
+		sha1->e = sha1->digest[4];
+		for (j = 0; j < 80; j++)
+		{
+			if ((j >= 0) && (j < 20))
+			{
+				sha1->f = ((sha1->b) & (sha1->c)) | ((~(sha1->b)) & (sha1->d));
+				k = 0x5A827999;
+			}
+			else if ((j >= 20) && (j < 40))
+			{
+				sha1->f = (sha1->b) ^ (sha1->c) ^ (sha1->d);
+				k = 0x6ED9EBA1;
+			}
+			else if ((j >= 40) && (j < 60))
+			{
+				sha1->f = ((sha1->b) & (sha1->c)) | ((sha1->b) & (sha1->d)) | ((sha1->c) & (sha1->d));
+				k = 0x8F1BBCDC;
+			}
+			else if ((j >= 60) && (j < 80))
+			{
+				sha1->f = (sha1->b) ^ (sha1->c) ^ (sha1->d);
+				k = 0xCA62C1D6;
+			}
+			temp = ROTL(5, (sha1->a)) + (sha1->f) + (sha1->e) + k + sha1->w[j];
+			sha1->e = (sha1->d);
+			sha1->d = (sha1->c);
+			sha1->c = ROTL(30, (sha1->b));
+			sha1->b = (sha1->a);
+			sha1->a = temp;
+			temp = 0x00;
+		}
+		sha1->digest[0] += sha1->a;
+		sha1->digest[1] += sha1->b;
+		sha1->digest[2] += sha1->c;
+		sha1->digest[3] += sha1->d;
+		sha1->digest[4] += sha1->e;
+		
+		buffer = buffer + 64;
+	}
+	return 0;
+}
+\end{lstlisting}
+
+\section{Тестирование реализации алгоритма}
+
+Было проведено тестирование на следующих входных данных:
+
+\begin{itemize}
+	\item пустой файл;
+	\item текстовый файл;
+	\item файл формата jpg;
+	\item архив формата zip.
+\end{itemize}
+
+\textbf{Для пустого файла:}
+
+Generated digest = 156048787866750836371052389361754228214758992386
+
+Encrypted SHA = 17633805474718278270253609790759353902590069560638221485698\\842800649636322228260579448361623151181869931903421073024919049779316618182042127312\\375760569671703065193471404441495723654235735540795221847107792797935305199108882157\\733856959251307392490224563446078546197345064195543458791559048774988
+
+Decrypted Hash value = 156048787866750836371052389361754228214758992386
+
+\textbf{Для тестового файла:}
+
+Generated digest = 814791834312585864639464326153728085570323449260
+
+Encrypted SHA = 42157081277406470013073850129045554791472746091058921771610\\723480583508617056222082184585159607204206613463065949844017030094304607497332007071\\105325619659848883673849560453947105225616603396579414783878943710868010171474956786\\905970047470367402468013765787507993531407072415817430021901405853277
+
+Decrypted Hash value = 814791834312585864639464326153728085570323449260
+
+\textbf{Для файла формата jpg:}
+
+Generated digest = 1409020340804790199905952219604609752067879784200
+
+Encrypted SHA = 19103206488314901193602721676026819143228791192128868501291\\492547749797308670542784759867840656331065119871125745909395805445444774130520325221\\994785352571009075261212034375387755975249077705109802221734282837422098353125431130\\603510124987891316601968660135414848729486594786332974691868670718731
+
+Decrypted Hash value = 1409020340804790199905952219604609752067879784200
+
+\textbf{Для файла формата zip:}
+
+Generated digest = 473167284371037228757425872343191003776458840519
+
+Encrypted SHA = 51357917249820376328272609690760465593193767998085452470290\\179336515816606072832197911566795998442523385227357758892870540437143734972750875097\\142066875795374111842899792560248716344596275105960648713571838881344549073726587203\\357436698659712994628877385078771476384888654081112202853247772599912
+
+Decrypted Hash value = 473167284371037228757425872343191003776458840519
+
+Для каждого из файлов был сформирован хэш. Хэш после дешифрования совпадает с хешом, поданным на вход функции дешифратору.
+
+Все тесты пройдены успешно.
+
+\section*{Вывод}
+В данном разделе были перечислены средства разработки, с помощью которых был реализованы алгоритмы RSA и SHA1, приведена реализация алгоритмов.
+
+

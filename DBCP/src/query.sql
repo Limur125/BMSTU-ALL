@@ -25,13 +25,14 @@ create table Reviews
 drop table if exists TimeRecords;
 create table TimeRecords
 (
+	TimeId int primary key identity(1, 1),
 	GameId int,
 	UserLogin nvarchar(200),
 	[Hours] int,
 	[Minutes] int,
 	[Type] int,
-	primary key(GameId, UserLogin, [Type])
 );
+set IDENTITY_INSERT TimeRecords on;
 drop table if exists Users;
 create table Users
 (

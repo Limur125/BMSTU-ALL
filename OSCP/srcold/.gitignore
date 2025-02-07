@@ -1,0 +1,16 @@
+*.cmd
+*.ko
+*.mod
+*.mod.c
+*.mod.o
+*.o
+*.kate-swp
+*.out
+.directory
+Module.symvers
+modules.order
+.vscode
+config.h
+pkg/build
+.directory
+__pycache__

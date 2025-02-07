@@ -1,0 +1,170 @@
+\chapter{Технологический раздел}
+\label{cha:impl}
+
+\section{Средства реализации}
+
+В качестве языка программирования для реализации данной лабораторной работы использовался язык программирования С++ \cite{cplusplus}, так как он позволяет работать с файлами и массивами. В качестве среды разработки использовалась Visual Studio Code \cite{vscode}.
+
+\section{Реализация алгоритмов}
+
+В листингах \ref{code:rotor}--\ref{code:enigma} представлена реализация алгоритма шифрования АES.
+
+\begin{lstlisting}[label=code:rotor,caption=Функция шифрования файла]
+int FileEncryption::cipher(string input, string output)
+{
+	    ifstream ifile;
+	ofstream ofile;
+	char inbuffer[16], outbuffer[16];
+	
+	if(input.length()  < 1) 
+	ifile = ifstream(stdin);
+	else
+	ifile.open(input, ios::binary | ios::in | ios::ate);
+	
+	if(output.length() < 1) 
+	ofile = ofstream(stdout);
+	else
+	ofile.open(output, ios::binary | ios::out);
+	size_t size = ifile.tellg();
+	ifile.seekg(0, ios::beg);
+	
+	
+	size_t block = size / 16;
+	
+	for(size_t i = 0; i < block; i++)
+	{
+		ifile.read(inbuffer, 16);
+		aes.Encrypt(inbuffer, 16, outbuffer);
+		ofile.write(outbuffer, 16);
+	}
+	if (size % 16 != 0)
+	{
+		int padding = 16 - (size % 16);
+		
+		memset(inbuffer, 0, 16);
+		ifile.read(inbuffer, 16 - padding);
+		aes.Encrypt(inbuffer, 16, outbuffer);
+		ofile.write(outbuffer, 16);
+	}
+	ifile.close();
+	ofile.close();
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=code:reflector,caption=Функция шифратора]
+void AES::EncryptBlock(const unsigned char in[], unsigned char out[],
+unsigned char key[]) {
+	unsigned char state[4][Nb];
+	unsigned int i, j, round;
+	unsigned char* roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
+	
+	KeyExpansion(key, roundKeys);
+	
+	for (i = 0; i < 4; i++) {
+		for (j = 0; j < Nb; j++) {
+			state[i][j] = in[i + 4 * j];
+		}
+	}
+	
+	AddRoundKey(state, roundKeys);
+	
+	for (round = 1; round <= Nr - 1; round++) {
+		SubBytes(state);
+		ShiftRows(state);
+		MixColumns(state);
+		AddRoundKey(state, roundKeys + round * 4 * Nb);
+	}
+	
+	SubBytes(state);
+	ShiftRows(state);
+	AddRoundKey(state, roundKeys + Nr * 4 * Nb);
+	
+	for (i = 0; i < 4; i++) {
+		for (j = 0; j < Nb; j++) {
+			out[i + 4 * j] = state[i][j];
+		}
+	}
+	delete[] roundKeys;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[label=code:enigma,caption=Функция расширения ключей]
+void AES::KeyExpansion(const unsigned char key[], unsigned char w[]) {
+	unsigned char temp[4];
+	unsigned char rcon[4];
+	
+	unsigned int i = 0;
+	while (i < 4 * Nk) {
+		w[i] = key[i];
+		i++;
+	}
+	
+	i = 4 * Nk;
+	while (i < 4 * Nb * (Nr + 1)) {
+		temp[0] = w[i - 4 + 0];
+		temp[1] = w[i - 4 + 1];
+		temp[2] = w[i - 4 + 2];
+		temp[3] = w[i - 4 + 3];
+		
+		if (i / 4 % Nk == 0) {
+			RotWord(temp);
+			SubWord(temp);
+			Rcon(rcon, i / (Nk * 4));
+			XorWords(temp, rcon, temp);
+		}
+		else if (Nk > 6 && i / 4 % Nk == 4) {
+			SubWord(temp);
+		}
+		
+		w[i + 0] = w[i - 4 * Nk] ^ temp[0];
+		w[i + 1] = w[i + 1 - 4 * Nk] ^ temp[1];
+		w[i + 2] = w[i + 2 - 4 * Nk] ^ temp[2];
+		w[i + 3] = w[i + 3 - 4 * Nk] ^ temp[3];
+		i += 4;
+	}
+}
+\end{lstlisting}
+
+\section{Тестирование реализации алгоритма}
+
+Было проведено тестирование на следующих входных данных:
+
+1. Входящая последовательность байтов:
+
+00, 11, 22, 33, 44, 55, 66, 77, 88, 99, aa, bb, cc, dd, ee, ff
+
+Зашифрованный текст:
+
+69, c4, e0, d8, 6a, 7b, 04, 30, d8, cd, b7, 80, 70, b4, c5, 5a
+	 
+Расшифрованная последовательность байтов:
+
+00, 11, 22, 33, 44, 55, 66, 77, 88, 99, aa, bb, cc, dd, ee, ff
+
+2. Входящая последовательность байтов:
+
+00, 11, 22, 33, 44, 55, 66, 77,
+88, 99, aa, bb, cc, dd, ee, ff,
+10, 11, 12, 13, 14, 15, 16, 17,
+18, 19, 1a, 1b, 1c, 1d, 1e, 1f
+
+Зашифрованная последовательность байтов:
+
+69, c4, e0, d8, 6a, 7b, 04, 30, d8, cd, b7,
+80, 70, b4, c5, 5a, 07, fe, ef, 74, e1, d5,
+03, 6e, 90, 0e, ee, 11, 8e, 94, 92, 93
+
+Расшифрованная последовательность байтов:
+
+00, 11, 22, 33, 44, 55, 66, 77,
+88, 99, aa, bb, cc, dd, ee, ff,
+10, 11, 12, 13, 14, 15, 16, 17,
+18, 19, 1a, 1b, 1c, 1d, 1e, 1f
+
+Все тесты пройдены успешно.
+
+\section*{Вывод}
+В данном разделе были перечислены средства разработки, с помощью которых был реализованы алгоритм шифрования AES, приведена реализация алгоритма.
+
+

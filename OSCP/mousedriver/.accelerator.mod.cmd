@@ -1,0 +1,1 @@
+cmd_/media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/accelerator.mod := printf '%s\n'   accelerator.o | awk '!x[$$0]++ { print("/media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/"$$0) }' > /media/alexey/5CF228A5F228857C/zolot/OSCP/mousedriver/accelerator.mod
