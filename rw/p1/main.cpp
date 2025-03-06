@@ -27,7 +27,7 @@ double TInter(double z0, double z1, double* zArr, double* tzArr, int zN)
 
 int main(void)
 {
-	int N = 40;
+	int N = 20;
 	double R = 0.35;
 	Reader reader("data.txt");
 	if (!reader.Read())

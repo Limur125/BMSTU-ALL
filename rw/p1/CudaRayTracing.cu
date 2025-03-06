@@ -391,18 +391,26 @@ cudaError_t GetInitialIntensity(Lamp lamp, double* res, int n, int m)
 	printf("\n");
 	RayIntensityAbsorb(host_rays, raysN, lamp.Cylinders, lamp.cylsN, host_intens,
 		lamp.TArr, lamp.nuArr, lamp.TN, lamp.nuN, lamp.kMatr, hostCylEnergy);
-
-	for (int i = 0; i < lamp.cylsN + 1; i++)
+	double prevR = 0;
+	for (int l = 0; l < lamp.nuN - 1; l++)
 	{
-		double sum = 0;
-		for (int l = 0; l < lamp.nuN - 1; l++)
+		double nuAvg = lamp.nuArr[l] + lamp.nuArr[l + 1];
+		
+		for (int i = lamp.cylsN - 1; i >= 0; i--)
 		{
+			double K = k(lamp.Cylinders[i].T, l, lamp.kMatr, lamp.TArr, lamp.nuArr, lamp.TN, lamp.nuN);
+			double c = 3e8;
+			double q3 = 0;
 			for (int r = 0; r < raysN; r++)
 			{
-				sum += hostCylEnergy[(i * (lamp.nuN - 1) + l) * raysN + r];
+				q3 += hostCylEnergy[(i * (lamp.nuN - 1) + l) * raysN + r];
 			}
+			double qp = q3 * 2 * lamp.R / (lamp.Cylinders[i].R0 * lamp.Cylinders[i].R0 - prevR * prevR);
+			prevR = lamp.Cylinders[i].R0;
+			double Fl = Inup(nuAvg, lamp.Cylinders[i].T) * 4 * PI * K - qp * K;
+			printf("%.3g ", Fl);
 		}
-		printf("%.3g ", sum);
+		printf("\n");
 	}
 
 
