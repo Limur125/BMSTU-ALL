@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,33 +9,92 @@ namespace lab1
 {
     public class Node(string value, Node? leftNode = null, Node? rightNode = null)
     {
+        public int index;
         public string value = value;
         public Node? leftChild = leftNode;
         public Node? rightChild = rightNode;
-
-        public NFA createNFA()
+        public bool nullable = false;
+        public HashSet<int> firstpos = [], lastpos = [];
+        public Dictionary<int, HashSet<int>> followpos = [];
+        public DFA CreateDFA()
         {
-            NFA? leftNFA = null, rightNFA = null;
+            SetIndex(0);
+            NullableFirstposLastpos();
+            Followpos();
+            Dictionary<int, HashSet<int>> treeFollowpos = [];
+            treeFollowpos = GetTreeFollowpos(treeFollowpos);
+            Dictionary<int, string> indexedStates = [];
+            indexedStates = GetIndexedStates(indexedStates);
+            return new DFA(this, indexedStates, treeFollowpos);
+        }
+
+        public int SetIndex(int index)
+        {
+            if (leftChild is null && rightChild is null)
+            {
+                this.index = index;
+                index++;
+            }
+            else
+            {
+                if (leftChild is not null)
+                    index = leftChild.SetIndex(index);
+                if (rightChild is not null)
+                    index = rightChild.SetIndex(index);
+            }
+            return index;
+        }
+
+        public Dictionary<int, HashSet<int>> GetTreeFollowpos(Dictionary<int, HashSet<int>> res)
+        {
+            foreach (var pair in followpos)
+            {
+                if (res.TryGetValue(pair.Key, out HashSet<int>? value))
+                {
+                    res[pair.Key] = [.. value, .. pair.Value];
+                }
+                else
+                {
+                    res[pair.Key] = [ .. pair.Value];
+                }
+            }
             if (leftChild is not null)
-                leftNFA = leftChild.createNFA();
+                res = leftChild.GetTreeFollowpos(res);
             if (rightChild is not null)
-                rightNFA = rightChild.createNFA();
-            return _mergeNFA(leftNFA, rightNFA);
+                res = rightChild.GetTreeFollowpos(res);
+            return res;
         }
 
-        public virtual NFA _mergeNFA(NFA leftNFA, NFA rightNFA)
+        private Dictionary<int, string> GetIndexedStates(Dictionary<int, string> res)
         {
-            var nfa = new NFA();
-            Guid state1 = Guid.NewGuid(), state2 = Guid.NewGuid();
-            nfa.add(state1.ToString(), state2.ToString(), value);
-
-
-            nfa.startState = state1.ToString();
-            nfa.setFinishState(state2.ToString());
-
-
-            return nfa;
+            if (leftChild is null && rightChild is null)
+            {
+                res[index] = value;
+            }
+            else
+            {
+                if (leftChild is not null)
+                    res = leftChild.GetIndexedStates(res);
+                if (rightChild is not null)
+                    res = rightChild.GetIndexedStates(res);
+            }
+            return res;
         }
+
+        public virtual void NullableFirstposLastpos()
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                nullable = true;
+            }
+            else
+            {
+                nullable = false;
+                firstpos.Add(index);
+                lastpos.Add(index);
+            }
+        }
+        public virtual void Followpos() { }
     }
 
     public class NodeOperator(string value, Node? leftNode = null, Node? rightNode = null) : Node(value, leftNode, rightNode)
@@ -44,102 +104,61 @@ namespace lab1
 
     public class NodeStar(Node? leftNode = null, Node? rightNode = null) : Node(Consts.starSymbol, leftNode, rightNode)
     {
-        public override NFA _mergeNFA(NFA leftNFA, NFA rightNFA)
+        public override void NullableFirstposLastpos()
         {
-            var nfa = new NFA();
-
-            foreach (var elem in leftNFA.stateDict)
-                nfa.stateDict = nfa.stateDict.Append(elem).ToDictionary();
-
-            string state1 = Guid.NewGuid().ToString(), state2 = Guid.NewGuid().ToString();
-
-            nfa.add(state1, leftNFA.startState, Consts.epsSymbol);
-            nfa.add(state1, state2, Consts.epsSymbol);
-            foreach (var finishState in leftNFA.finishState)
-            {
-                nfa.add(finishState, leftNFA.startState, Consts.epsSymbol);
-                nfa.add(finishState, state2, Consts.epsSymbol);
-            }
-
-            nfa.startState = state1;
-            nfa.setFinishState(state2);
-
-            return nfa;
+            leftChild?.NullableFirstposLastpos();
+            nullable = true;
+            firstpos = [.. leftChild!.firstpos];
+            lastpos = [.. leftChild!.lastpos];
         }
-    }
 
-    public class NodePlus(Node? leftNode = null, Node? rightNode = null) : Node(Consts.plusSymbol, leftNode, rightNode)
-    {
-        public override NFA _mergeNFA(NFA leftNFA, NFA rightNFA)
+        public override void Followpos()
         {
-            var nfa = new NFA();
-
-            foreach (var elem in leftNFA.stateDict)
-                nfa.stateDict = nfa.stateDict.Append(elem).ToDictionary();
-
-            string state1 = Guid.NewGuid().ToString(), state2 = Guid.NewGuid().ToString();
-
-            nfa.add(state1, leftNFA.startState, Consts.epsSymbol);
-            foreach (var finishState in leftNFA.finishState)
+            leftChild?.Followpos();
+            foreach (var item in leftChild!.lastpos)
             {
-                nfa.add(finishState, leftNFA.startState, Consts.epsSymbol);
-                nfa.add(finishState, state2, Consts.epsSymbol);
+                followpos[item] = [.. leftChild.firstpos];
             }
-
-            nfa.startState = state1;
-            nfa.setFinishState(state2);
-
-            return nfa;
         }
+
     }
 
     public class NodeOr(Node ? leftNode = null, Node ? rightNode = null) : Node(Consts.orSymbol, leftNode, rightNode)
     {
-        public override NFA _mergeNFA(NFA leftNFA, NFA rightNFA)
+        public override void NullableFirstposLastpos()
         {
-            var nfa = new NFA();
-
-            foreach (var elem in leftNFA.stateDict)
-                nfa.stateDict = nfa.stateDict.Append(elem).ToDictionary();
-            foreach (var elem in rightNFA.stateDict)
-                nfa.stateDict = nfa.stateDict.Append(elem).ToDictionary();
-
-            string state1 = Guid.NewGuid().ToString(), state2 = Guid.NewGuid().ToString();
-
-            nfa.add(state1, leftNFA.startState, Consts.epsSymbol);
-            nfa.add(state1, rightNFA.startState, Consts.epsSymbol);
-
-            foreach (var finishState in leftNFA.finishState)
-                nfa.add(finishState, state2, Consts.epsSymbol);
-            foreach (var finishState in rightNFA.finishState)
-                nfa.add(finishState, state2, Consts.epsSymbol);
-
-            nfa.startState = state1;
-            nfa.setFinishState(state2);
-
-            return nfa;
+            leftChild?.NullableFirstposLastpos();
+            rightChild?.NullableFirstposLastpos();
+            nullable = leftChild!.nullable || rightChild!.nullable;
+            firstpos = [.. leftChild!.firstpos, .. rightChild!.firstpos];
+            lastpos = [.. leftChild!.lastpos, .. rightChild!.lastpos];
         }
     }
 
     public class NodeAnd(Node? leftNode = null, Node? rightNode = null) : Node(Consts.andSymbol, leftNode, rightNode)
     {
-        public override NFA _mergeNFA(NFA leftNFA, NFA rightNFA)
+        public override void NullableFirstposLastpos()
         {
-            var nfa = new NFA();
+            leftChild?.NullableFirstposLastpos();
+            rightChild?.NullableFirstposLastpos();
 
-            foreach (var elem in leftNFA.stateDict)
-                nfa.stateDict = nfa.stateDict.Append(elem).ToDictionary();
-            foreach (var elem in rightNFA.stateDict)
-                nfa.stateDict = nfa.stateDict.Append(elem).ToDictionary();
+            nullable = leftChild!.nullable && rightChild!.nullable;
+            firstpos = [.. leftChild.firstpos];
 
-            foreach (var finishState in leftNFA.finishState)
-                nfa.add(finishState, rightNFA.startState, Consts.epsSymbol);
+            if (leftChild.nullable)
+                firstpos = [.. firstpos, .. rightChild!.firstpos];
+            lastpos = [.. rightChild!.lastpos];
 
-            nfa.startState = leftNFA.startState;
-            foreach (var finishState in rightNFA.finishState)
-                nfa.setFinishState(finishState);
+            if (rightChild.nullable)
+                lastpos = [.. lastpos, .. rightChild!.lastpos];
+        }
 
-            return nfa;
+        public override void Followpos()
+        {
+            leftChild?.Followpos();
+            rightChild?.Followpos();
+            foreach (var item in leftChild!.lastpos)
+                followpos[item] = [.. rightChild!.firstpos];
         }
     }
 }

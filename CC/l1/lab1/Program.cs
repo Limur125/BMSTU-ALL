@@ -9,27 +9,28 @@ namespace lab1
     {
         static void Main(string[] args)
         {
-            string regex = "(b+|c)*a";
+            string input = "a*b*";
+            string regex = "(" + input + ")#";
             var parser = new RegexParser();
             var resTree = parser.parseExpression(regex);
-            var nfa = resTree.createNFA();
-            var nodes = nfa.stateDict.Keys.ToList();
-            nodes.AddRange(nfa.finishState);
+            var dfa = resTree.CreateDFA();
+
+            var nodes = dfa.Dtran.Keys.ToList();
+            nodes.AddRange(dfa.finishStates);
             using StreamWriter file = new StreamWriter("graph.dot");
             file.WriteLine("digraph nfa {");
-            file.WriteLine($"999999 [label=\"{regex}\" peripheries=0 shape=\"box\"];");
-            file.WriteLine($"999999 -> {nodes.IndexOf(nfa.startState)}");
+            file.WriteLine($"999999 [label=\"{input}\" peripheries=0 shape=\"box\"];");
+            file.WriteLine($"999999 -> {nodes.IndexOf(dfa.startState)}");
             int i = 1;
-            foreach (var finNode in nfa.finishState)
+            foreach (var finNode in dfa.finishStates)
             {
                 file.WriteLine($"{999999 + i} [style=invis];");
                 file.WriteLine($"{nodes.IndexOf(finNode)} -> {999999 + i}");
             }
 
-            foreach (var keyValuePair in nfa.stateDict)
+            foreach (var keyValuePair in dfa.Dtran)
                 foreach (var finKeyValuePair in keyValuePair.Value)
-                    foreach(var trans in finKeyValuePair.Value)
-                        file.WriteLine($"{nodes.IndexOf(keyValuePair.Key)} -> {nodes.IndexOf(trans)} [label=\"{finKeyValuePair.Key}\"];");
+                    file.WriteLine($"{nodes.IndexOf(keyValuePair.Key)} -> {nodes.IndexOf(finKeyValuePair.Value)} [label=\"{finKeyValuePair.Key}\"];");
             file.WriteLine("}");
         }
     }

@@ -99,7 +99,7 @@ namespace lab1
                         throw new Exception("Ошибка: неверная постановка символа +");
                     var nodeLeft = updLst.Last();
                     updLst.Remove(nodeLeft);
-                    node = new NodePlus(leftNode: nodeLeft);
+                    node = new NodeAnd(leftNode: nodeLeft, rightNode: new NodeStar(leftNode: nodeLeft));
                 }
                 updLst.Add(node);
             }
