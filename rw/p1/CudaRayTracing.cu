@@ -3,7 +3,7 @@
 
 #define PI (4 * atan(1))
 #define PI2 (acos(0))
-#define REFLECT_COEF 0.9
+#define REFLECT_COEF 0.0
 
 void RayIntensity(Ray* rays, int raysN, Cylinder* cyls, int cylsN, double* intens,
 	double* TArr, double* nuArr, int TN, int nuN, double** kMatr);
@@ -383,21 +383,22 @@ cudaError_t GetInitialIntensity(Lamp lamp, double* res, int n, int m)
 			double z = host_rays[r].Direction.Z;
 			double tetha = atan(sqrt(x * x + y * y) / z);
 			host_intens[l * raysN + r] *= dphi * dtetha * sin(tetha) * cos(tetha);
-			//printf("%.3g ", host_intens[l * raysN + r]);
-		}
-		//printf("\n");
+		}	
 	}
 
 	printf("\n");
 	RayIntensityAbsorb(host_rays, raysN, lamp.Cylinders, lamp.cylsN, host_intens,
 		lamp.TArr, lamp.nuArr, lamp.TN, lamp.nuN, lamp.kMatr, hostCylEnergy);
+
+
 	double prevR = 0;
-	for (int l = 0; l < lamp.nuN - 1; l++)
+
+	for (int i = lamp.cylsN - 1; i >= 0; i--)
 	{
-		double nuAvg = lamp.nuArr[l] + lamp.nuArr[l + 1];
-		
-		for (int i = lamp.cylsN - 1; i >= 0; i--)
+		double fSum = 0;
+		for (int l = 0; l < lamp.nuN - 1; l++)
 		{
+			double nuAvg = lamp.nuArr[l] + lamp.nuArr[l + 1];
 			double K = k(lamp.Cylinders[i].T, l, lamp.kMatr, lamp.TArr, lamp.nuArr, lamp.TN, lamp.nuN);
 			double c = 3e8;
 			double q3 = 0;
@@ -406,11 +407,13 @@ cudaError_t GetInitialIntensity(Lamp lamp, double* res, int n, int m)
 				q3 += hostCylEnergy[(i * (lamp.nuN - 1) + l) * raysN + r];
 			}
 			double qp = q3 * 2 * lamp.R / (lamp.Cylinders[i].R0 * lamp.Cylinders[i].R0 - prevR * prevR);
-			prevR = lamp.Cylinders[i].R0;
+
 			double Fl = Inup(nuAvg, lamp.Cylinders[i].T) * 4 * PI * K - qp * K;
-			printf("%.3g ", Fl);
+			fSum += Fl;
+
 		}
-		printf("\n");
+		prevR = lamp.Cylinders[i].R0;
+		//printf("%.3g ", fSum);
 	}
 
 

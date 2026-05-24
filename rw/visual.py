@@ -5,8 +5,8 @@ y = []
 with open("res.txt", 'r') as f:
     for line in f.readlines():
         x = list(map(float, line.split()))
-        h = 0.35 / 20
-        y = [0.35 - i * h for i in range(20, 0, -1)]
+        h = 0.35 / len(x)
+        y = [i * h for i in range(0, len(x))]
 
 # x0s = []
 # y0s = []

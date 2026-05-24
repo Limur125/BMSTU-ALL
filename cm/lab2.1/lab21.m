@@ -1,21 +1,22 @@
 function lab01()
     clc();
+    clf();
 
     debugFlg = 1;
+    plotF = 1;
     delayS = 0.8;
     a = 0;
     b = 1;
     eps = 0.01;
-
     fplot(@f, [a, b]);
     hold on;
     
-    [xStar, fStar] = bitwiseSearch(a, b, eps, debugFlg, delayS);
-
+    [xStar, fStar] = bitwiseSearch(a, b, eps, debugFlg, delayS, plotF);
+    
     scatter(xStar, fStar, 'r', 'filled');
 end
 
-function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS)
+function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS, plotF)
     i = 0;
     delta = (b - a) / 4;
     x0 = a;
@@ -31,16 +32,17 @@ function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS)
 
         if debugFlg
             fprintf('№ %2d x*=%.10f f(x*)=%.10f\n', i, x1, f1);
-
-            plot_x(end + 1) = x1;
-            plot_f(end + 1) = f1;
-
-            clc();
-            plot(plot_x, plot_f, 'xk');
-
-            plot(x1, f1, 'xr');
-            hold on;
-            pause(delayS);
+            if plotF
+                plot_x(end + 1) = x1;
+                plot_f(end + 1) = f1;
+    
+                clc();
+                plot(plot_x, plot_f, 'xk');
+    
+                plot(x1, f1, 'xr');
+                hold on;
+                pause(delayS);
+            end
         end
 
         if f0 > f1
@@ -73,10 +75,12 @@ function [x0, f0] = bitwiseSearch(a, b, eps, debugFlg, delayS)
     if debugFlg
         fprintf('№ %2d x*=%.10f f(x*)=%.10f\n', i, x0, f0);
         fprintf('RESULT: x*=%.10f f(x*)=%.10f\n', x0, f0);
-        plot(plot_x, plot_f, 'xk');
+        if plotF
+            plot(plot_x, plot_f, 'xk');
+        end
     end
 end
 
 function y = f(x)
-    y = cos(power(x,5) - x + 3 + power(2, 1/3)) + atan((power(x,3) - 5 * sqrt(2)*x - 4) / (sqrt(6)*x + sqrt(3))) + 1.8;
+    y = power(4 * power(x,3) + 2 * x * x - 4 * x + 2, sqrt(2)) + asin(1 / (-x * x + x + 5)) + 5.0;
 end

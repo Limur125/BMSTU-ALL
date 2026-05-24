@@ -18,7 +18,7 @@ namespace lab1
         public Dictionary<int, HashSet<int>> followpos = [];
         public DFA CreateDFA()
         {
-            SetIndex(0);
+            SetIndex(1);
             NullableFirstposLastpos();
             Followpos();
             Dictionary<int, HashSet<int>> treeFollowpos = [];
@@ -94,7 +94,11 @@ namespace lab1
                 lastpos.Add(index);
             }
         }
-        public virtual void Followpos() { }
+        public virtual void Followpos() 
+        {
+            leftChild?.Followpos();
+            rightChild?.Followpos();
+        }
     }
 
     public class NodeOperator(string value, Node? leftNode = null, Node? rightNode = null) : Node(value, leftNode, rightNode)
@@ -143,14 +147,14 @@ namespace lab1
             rightChild?.NullableFirstposLastpos();
 
             nullable = leftChild!.nullable && rightChild!.nullable;
+            
             firstpos = [.. leftChild.firstpos];
-
             if (leftChild.nullable)
                 firstpos = [.. firstpos, .. rightChild!.firstpos];
-            lastpos = [.. rightChild!.lastpos];
 
+            lastpos = [.. rightChild!.lastpos];
             if (rightChild.nullable)
-                lastpos = [.. lastpos, .. rightChild!.lastpos];
+                lastpos = [.. lastpos, .. leftChild!.lastpos];
         }
 
         public override void Followpos()

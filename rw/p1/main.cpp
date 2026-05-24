@@ -27,7 +27,7 @@ double TInter(double z0, double z1, double* zArr, double* tzArr, int zN)
 
 int main(void)
 {
-	int N = 20;
+	int N = 3;
 	double R = 0.35;
 	Reader reader("data.txt");
 	if (!reader.Read())
@@ -37,13 +37,13 @@ int main(void)
 	Cylinder *cylinders = new Cylinder[N];
 	for (int i = 0; i < N; i++)
 	{
-		cylinders[N - i - 1] = { R / N * (i + 1), TInter(1.0 / N * i, 1.0 / N * (i + 1), reader.zArr, reader.tzArr, reader.zN) /*Tavg(R / N * i, R / N * (i + 1), R)*/};
+		cylinders[N - i - 1] = { R / N * (i + 1), /*TInter(1.0 / N * i, 1.0 / N * (i + 1), reader.zArr, reader.tzArr, reader.zN)*/ Tavg(R / N * i, R / N * (i + 1), R)};
 	}
 	Lamp lamp(R, cylinders, N,
 		reader.TArr, reader.TN,
 		reader.nuArr, reader.nuN,
 		reader.kMatr);
-	int n = 20, m = 10;
+	int n = 2, m = 3;
 	double *res = new double[n * m + 1];
 
 	//for (int i = 0; i < lamp.nuN - 1; i++)

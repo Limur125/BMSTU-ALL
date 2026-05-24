@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace lab1
 {
@@ -14,6 +15,7 @@ namespace lab1
         public Dictionary<int, Dictionary<string, int>> Dtran = [];
         public HashSet<string> Alphabet = [];
 
+        public DFA() { }
         public DFA(Node tree, Dictionary<int, string> indexedStates, Dictionary<int, HashSet<int>> treeFollowpos)
         {
             foreach (var s in indexedStates)
@@ -64,6 +66,29 @@ namespace lab1
 
                 }
             }
+        }
+
+        public bool Accept(string data)
+        {
+            var curState = startState;
+            for (int i = 0; i < data.Length; i++)
+            {
+                Console.Write("|-{0}", data[i..]);
+                int toState = Dtran.GetValueOrDefault(curState, []).GetValueOrDefault(data[i].ToString(), -1);
+                if (toState == -1)
+                {
+                    Console.WriteLine("|-нет");
+                    return false;
+                }
+                curState = toState;
+            }
+            if (!finishStates.Contains(curState))
+            {
+                Console.WriteLine("|-нет");
+                return false;
+            }
+            Console.WriteLine("|-да");
+            return true;
         }
     }
 

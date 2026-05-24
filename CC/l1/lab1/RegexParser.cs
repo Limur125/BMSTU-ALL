@@ -73,7 +73,7 @@ namespace lab1
             {
                 var node = nodeLst[i];
 
-                if (node.value == Consts.starSymbol)
+                if (node is NodeOperator && node.value == Consts.starSymbol)
                 {
                     if (i == 0)
                         throw new Exception("Ошибка: неверная постановка символа *");
@@ -93,7 +93,7 @@ namespace lab1
             {
                 var node = nodeLst[i];
 
-                if (node.value == Consts.plusSymbol)
+                if (node is NodeOperator && node.value == Consts.plusSymbol)
                 {
                     if (i == 0)
                         throw new Exception("Ошибка: неверная постановка символа +");
